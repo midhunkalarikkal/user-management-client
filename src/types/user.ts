@@ -1,11 +1,12 @@
+import type { UserSearchLabel } from "@/utils/constant";
 
-/** Represents geographical latitude and longitude coordinates. */
+// User location coordinates
 export interface Coordinates {
   lat: number;
   lng: number;
 }
 
-/** Represents a user's residential or company address. */
+// User address details
 export interface Address {
   address: string;
   city: string;
@@ -16,13 +17,13 @@ export interface Address {
   country: string;
 }
 
-/** Represents a user's hair color and type. */
+// User hair details
 export interface Hair {
   color: string;
   type: string;
 }
 
-/** Represents a user's banking and payment information. */
+// User bank details
 export interface Bank {
   cardExpire: string;
   cardNumber: string;
@@ -31,7 +32,7 @@ export interface Bank {
   iban: string;
 }
 
-/** Represents a user's employment and company details. */
+// User company details
 export interface Company {
   department: string;
   name: string;
@@ -39,20 +40,20 @@ export interface Company {
   address: Address;
 }
 
-/** Represents a user's cryptocurrency wallet information. */
+// User crypto details
 export interface Crypto {
   coin: string;
   wallet: string;
   network: string;
 }
 
-/** Defines the supported user roles. */
+// Available user roles
 export type UserRole = "admin" | "moderator" | "user";
 
-/** Defines the supported user gender values. */
+// Available gender options
 export type UserGender = "male" | "female" | "other";
 
-/** Represents a complete user record returned by the DummyJSON Users API. */
+// User data from DummyJSON API
 export interface User {
   id: number;
   firstName: string;
@@ -84,7 +85,7 @@ export interface User {
   role: UserRole;
 }
 
-/** Represents the paginated response returned by the users listing endpoint. */
+// Users API response with pagination
 export interface UsersResponse {
   users: User[];
   total: number;
@@ -92,8 +93,42 @@ export interface UsersResponse {
   limit: number;
 }
 
-/** Defines the optional user fields accepted when creating a user, excluding the ID. */
+// Data for creating a user
 export type CreateUserInput = Partial<Omit<User, "id">>;
 
-/** Defines the optional user fields accepted when updating a user, excluding the ID. */
+// Data for updating a user
 export type UpdateUserInput = Partial<Omit<User, "id">>;
+
+// Fields available for sorting users
+export type UserSortField = "firstName" | "age" | "email";
+
+// Sorting order
+export type SortOrder = "asc" | "desc";
+
+// Users sorting options
+export interface UsersSort {
+  sortBy?: UserSortField;
+  order?: SortOrder;
+}
+
+// Users table data
+export type UsersTableColumn = Pick<
+  User,
+  "id" | "firstName" | "lastName" | "age" | "email" | "role"
+>;
+
+// Get users query parameters
+export interface GetUsersQueryParams {
+  page: number;
+  limit: number;
+  sortBy?: UserSortField;
+  order?: SortOrder;
+}
+
+// Paginated API response
+export interface ApiPaginatedResponse<TData> {
+  users: TData[];
+  total: number;
+  skip: number;
+  limit: number;
+}

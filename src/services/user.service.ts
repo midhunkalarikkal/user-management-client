@@ -1,13 +1,49 @@
-
 import { api } from "@/lib/axios";
-import type { UsersResponse } from "@/types/user";
+import type {
+  User,
+  UsersTableColumn,
+  GetUsersQueryParams,
+  ApiPaginatedResponse,
+} from "@/types/user";
 
+// fet paginated list of users.
 export async function getUsers(
+  queryParams: GetUsersQueryParams,
   signal?: AbortSignal
-): Promise<UsersResponse> {
-  const { data } = await api.get<UsersResponse>("/users", {
+): Promise<ApiPaginatedResponse<UsersTableColumn>> {
+  const {
+    page,
+    limit,
+    sortBy,
+    order,
+  } = queryParams;
+
+  const skip = (page - 1) * limit;
+
+  const { data } = await api.get<
+    ApiPaginatedResponse<UsersTableColumn>
+  >("/users", {
+    params: {
+      limit,
+      skip,
+      ...(sortBy && { sortBy }),
+      ...(sortBy && { order: order ?? "asc" }),
+    },
     signal,
   });
-  console.log("data : ",data);
+
+  return data;
+}
+
+// fetch a single user.
+export async function getUserById(
+  userId: number,
+  signal?: AbortSignal
+): Promise<User> {
+  const { data } = await api.get<User>(
+    `/users/${userId}`,
+    { signal }
+  );
+
   return data;
 }

@@ -8,5 +8,6 @@ export async function getUsers(
   const { data } = await api.get<UsersResponse>("/users", {
     signal,
   });
+  console.log("data : ",data);
   return data;
 }

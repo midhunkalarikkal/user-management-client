@@ -1,10 +1,14 @@
+import { Button } from "@/components/ui/button";
+
 function App() {
 
   return (
-     <main className="flex min-h-screen items-center justify-center bg-slate-950">
-      <h1 className="text-4xl font-bold text-white">
+     <main className="flex min-h-screen flex-col items-center justify-center gap-6">
+      <h1 className="text-3xl font-bold">
         User Management Application
       </h1>
+
+      <Button>Add User</Button>
     </main>
   )
 }

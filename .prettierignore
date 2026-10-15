@@ -1,6 +1,8 @@
 node_modules
 dist
 coverage
-.vite
-*.tsbuildinfo
+.pnpm-store
+.vercel
+.env
+.env.*
 pnpm-lock.yaml

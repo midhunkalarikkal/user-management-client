@@ -14,7 +14,7 @@ import {
 import { Link, useLocation } from "react-router";
 import { navigationItems } from "@/utils/constant";
 
-export default function AppSidebar() {
+const AppSidebar = () => {
   const { pathname } = useLocation();
 
   return (
@@ -67,3 +67,5 @@ export default function AppSidebar() {
     </Sidebar>
   );
 }
+
+export default AppSidebar;

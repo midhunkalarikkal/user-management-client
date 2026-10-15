@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, FileQuestion } from "lucide-react";
 
-export default function NotFoundPage() {
+const NotFoundPage = () => {
   return (
     <section className="flex min-h-[calc(100dvh-9rem)] flex-col items-center justify-center px-6 py-12 text-center">
       <div className="mb-8 flex size-16 items-center justify-center rounded-2xl border border-border">
@@ -29,3 +29,4 @@ export default function NotFoundPage() {
     </section>
   );
 }
+export default NotFoundPage;

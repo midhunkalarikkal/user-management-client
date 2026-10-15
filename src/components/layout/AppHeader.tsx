@@ -2,7 +2,7 @@ import { useMatches } from "react-router";
 import type { RouteMetadata } from "@/types/components";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
-export default function AppHeader() {
+const AppHeader = () => {
   const matches = useMatches();
 
   const currentRoute = [...matches]
@@ -30,3 +30,5 @@ export default function AppHeader() {
     </header>
   );
 }
+
+export default AppHeader;

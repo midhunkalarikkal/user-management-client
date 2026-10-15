@@ -1,18 +1,24 @@
 import { Plus } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
+import { Link, useNavigate } from "react-router";
 import { getUsers } from "@/services/user.service";
 import type { UsersTableColumn } from "@/types/user";
-import DataTable from "@/components/table/data-table";
+import DataTable from "@/components/table/DataTable";
+import { useCallback, useMemo, useState } from "react";
 import useDeleteUser from "@/hooks/mutations/users/use-delete-user";
 import { USERS_SEARCH_FIELDS, USERS_SORT_BY } from "@/utils/constant";
-import UsersTableColumns from "@/components/table/columns/users-column";
+import UsersTableColumns from "@/components/table/columns/UsersTableColumns";
+import DeleteUserConfirmation from "@/components/alerts/DeleteUserConfirmation";
 
 const UsersPage = () => {
 
   const navigate = useNavigate();
-  const { confirmDelete, deletingUserId } = useDeleteUser();
+  const {
+    mutate: deleteUser,
+    isPending: isDeleting,
+    deletingUserId,
+  } = useDeleteUser();
   const [selectedUser, setSelectedUser] = useState<UsersTableColumn | null>(null);
 
   const handleViewDetails = useCallback(
@@ -31,9 +37,30 @@ const UsersPage = () => {
 
   const handleDeleteUser = useCallback(
     (user: UsersTableColumn) => {
-      confirmDelete(user);
+      if (isDeleting) return;
+
+      toast(
+        ({ closeToast }) => (
+          <DeleteUserConfirmation
+            user={user}
+            onCancel={closeToast}
+            onConfirm={() => {
+              closeToast();
+              deleteUser(user.id);
+            }}
+          />
+        ),
+        {
+          toastId: "confirm-delete-user",
+          autoClose: false,
+          closeOnClick: false,
+          closeButton: false,
+          draggable: false,
+          position: "top-center",
+        },
+      );
     },
-    [confirmDelete],
+    [deleteUser, isDeleting],
   );
 
   const columns = useMemo(

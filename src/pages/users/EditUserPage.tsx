@@ -2,7 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useParams } from "react-router";
-import UserForm from "@/components/users/user-form";
+import UserForm from "@/components/users/UserForm";
 import { getUserById } from "@/services/user.service";
 import type { UserFormValues } from "@/schemas/user.schema";
 import useUpdateUser from "@/hooks/mutations/users/use-update-user";

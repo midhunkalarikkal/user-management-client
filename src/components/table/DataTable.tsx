@@ -32,25 +32,14 @@ import {
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { SORT_ORDERS } from "@/utils/constant";
-import { features } from "./data-table-features";
+import { features } from "./DataTableFeatures";
 import type { UserSearchField } from "@/types/common";
 import type { DataTableProps } from "@/types/components";
 import { isValidValue } from "@/utils/helper/isValidValue";
+import { getPositiveInteger } from "@/utils/helper/etPositiveInteger";
 import type { SortOrder, UserSortField, GetUsersQueryParams } from "@/types/user";
 
-// Reads a positive integer from URL parameters.
-function getPositiveInteger(value: string | null, fallback: number): number {
-  if (!value || !/^\d+$/.test(value)) {
-    return fallback;
-  }
-
-  const parsed = Number(value);
-
-  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback;
-}
-
-// Renders a reusable API-driven table.
-export default function DataTable<TData extends RowData>({
+const DataTable = <TData extends RowData>({
   columns,
   queryFunction,
   queryKey,
@@ -58,14 +47,12 @@ export default function DataTable<TData extends RowData>({
   searchByConstants = [],
   emptyMessage = "No records found.",
   getRowId,
-}: DataTableProps<TData>) {
+}: DataTableProps<TData>) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Reads pagination from the URL.
   const page = getPositiveInteger(searchParams.get("page"), 1);
   const limit = Math.min(getPositiveInteger(searchParams.get("limit"), 10), 100);
 
-  // Validates sorting parameters.
   const sortByParam = searchParams.get("sortBy");
   const orderParam = searchParams.get("order");
   const searchKeyParam = searchParams.get("searchKey");
@@ -120,7 +107,6 @@ export default function DataTable<TData extends RowData>({
     ? orderParam
     : undefined;
 
-  // Creates the query parameters for the API.
   const queryParams: GetUsersQueryParams = {
     page,
     limit,
@@ -129,7 +115,6 @@ export default function DataTable<TData extends RowData>({
     searchValue: searchKey ? searchValueParam : undefined,
   };
 
-  // Fetches records inside the reusable table.
   const { data, error, isError, isPending, isFetching, refetch } = useQuery({
     queryKey: [
       queryKey,
@@ -143,7 +128,6 @@ export default function DataTable<TData extends RowData>({
     queryFn: ({ signal }) => queryFunction(queryParams, signal),
   });
 
-  // Updates the search field and resets the current search.
   function handleSearchFieldChange(value: string | null) {
     setSearchInput("");
 
@@ -163,7 +147,6 @@ export default function DataTable<TData extends RowData>({
     });
   }
 
-  // Removes the selected search field and value.
   function clearSearch() {
     setSearchInput("");
 
@@ -178,10 +161,8 @@ export default function DataTable<TData extends RowData>({
     });
   }
 
-  // Manages column visibility locally.
   const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibilityState>({});
 
-  // Always supplies an array to TanStack Table.
   const tableData = React.useMemo(() => data?.users ?? [], [data]);
 
   const table = useTable({
@@ -256,10 +237,9 @@ export default function DataTable<TData extends RowData>({
     });
   }
 
-  const start = total === 0 ? 0 : (page - 1) * limit + 1;
-
-  const end = Math.min(page * limit, total);
-
+  const currentPageCount = data?.users.length ?? 0;
+  const start = currentPageCount === 0 ? 0 : (page - 1) * limit + 1;
+  const end = currentPageCount === 0 ? 0 : start + currentPageCount - 1;
   const columnCount = Math.max(table.getVisibleLeafColumns().length, 1);
 
   return (
@@ -450,3 +430,5 @@ export default function DataTable<TData extends RowData>({
     </div>
   );
 }
+
+export default DataTable;

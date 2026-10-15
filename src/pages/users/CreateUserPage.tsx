@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router";
 import { ArrowLeft } from "lucide-react";
-import UserForm from "@/components/users/user-form";
+import UserForm from "@/components/users/UserForm";
 import useCreateUser from "@/hooks/mutations/users/use-create-user";
 import { Button } from "@/components/ui/button";
 import type { UserFormValues } from "@/schemas/user.schema";
 
-const AddUserPage = () => {
+const CreateUserPage = () => {
   const navigate = useNavigate();
 
   const { mutateAsync, isPending } = useCreateUser();
@@ -52,4 +52,4 @@ const AddUserPage = () => {
   );
 }
 
-export default AddUserPage;
+export default CreateUserPage;

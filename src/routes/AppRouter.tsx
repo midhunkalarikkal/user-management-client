@@ -2,13 +2,13 @@ import { lazy, Suspense } from "react";
 import { RouterProvider } from "react-router/dom";
 import { Navigate, createBrowserRouter } from "react-router";
 
-import AppLayout from "@/components/layout/app-layout";
+import AppLayout from "@/components/layout/AppLayout";
 
-const UsersPage = lazy(() => import("@/pages/users/users-page"));
-const AddUserPage = lazy(() => import("@/pages/users/create-user-page"));
-const EditUserPage = lazy(() => import("@/pages/users/edit-user-page"));
-const NotFoundPage = lazy(() => import("@/pages/errors/not-found-page"));
-const UserDetailsPage = lazy(() => import("@/pages/users/user-details-page"));
+const UsersPage = lazy(() => import("@/pages/users/UsersPage"));
+const CreateUserPage = lazy(() => import("@/pages/users/CreateUserPage"));
+const EditUserPage = lazy(() => import("@/pages/users/EditUserPage"));
+const NotFoundPage = lazy(() => import("@/pages/errors/NotFoundPage"));
+const UserDetailsPage = lazy(() => import("@/pages/users/UserDetailsPage"));
 
 const router = createBrowserRouter([
   {
@@ -36,7 +36,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/users/new",
-        element: <AddUserPage />,
+        element: <CreateUserPage />,
         handle: {
           title: "Add User",
           description: "Create a new user",
@@ -62,7 +62,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-export default function AppRouter() {
+const AppRouter = () => {
   return (
     <Suspense
       fallback={
@@ -77,3 +77,5 @@ export default function AppRouter() {
     </Suspense>
   );
 }
+
+export default AppRouter;

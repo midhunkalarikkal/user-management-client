@@ -6,9 +6,11 @@ import {
   MoreHorizontal,
   LoaderCircle,
 } from "lucide-react";
-import type { UsersTableColumn } from "@/types/user";
-import type { DataTableFeatures } from "../data-table-features";
-import { Button } from "@/components/ui/button";
+import {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+} from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -18,11 +20,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-} from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import type { UsersTableColumn } from "@/types/user";
+import type { DataTableFeatures } from "../DataTableFeatures";
 
 const columnHelper = createColumnHelper<
   DataTableFeatures,

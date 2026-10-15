@@ -38,11 +38,11 @@ import { REQUIRED_FIELDS } from "@/utils/constant";
 import type { UserFormField, UserFormProps } from "@/types/components";
 
 // reusing form for creating and updating users.
-export default function UserForm({
+const UserForm = ({
     user,
     isSubmitting = false,
     onSubmit,
-}: UserFormProps) {
+}: UserFormProps) => {
 
     const isEditing = Boolean(user);
 
@@ -251,3 +251,5 @@ export default function UserForm({
         </form>
     );
 }
+
+export default UserForm;

@@ -1,31 +1,21 @@
-import { useState } from "react";
+import type {
+  UsersTableColumn,
+  ApiPaginatedResponse,
+} from "@/types/user";
 import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { Button } from "@/components/ui/button";
 import { deleteUser } from "@/services/user.service";
-import type {
-  UsersTableColumn,
-  ApiPaginatedResponse,
-} from "@/types/user";
 
 // Handles user deletion and updates the query cache.
 const useDeleteUser = () => {
   const queryClient = useQueryClient();
 
-  const [deletingUserId, setDeletingUserId] = useState<
-    number | null
-  >(null);
-
   const mutation = useMutation({
     mutationKey: ["delete-user"],
     mutationFn: deleteUser,
-
-    onMutate: (userId) => {
-      setDeletingUserId(userId);
-    },
 
     onSuccess: async (data, userId) => {
       if (!data.isDeleted) {
@@ -56,7 +46,7 @@ const useDeleteUser = () => {
             total: Math.max(
               0,
               oldData.total -
-                (oldData.users.length - updatedUsers.length),
+              (oldData.users.length - updatedUsers.length),
             ),
           };
         },
@@ -71,71 +61,13 @@ const useDeleteUser = () => {
       );
     },
 
-    onSettled: () => {
-      setDeletingUserId(null);
-    },
   });
-
-  // Shows confirmation before deleting the selected user.
-  const confirmDelete = (user: UsersTableColumn) => {
-    if (mutation.isPending) return;
-
-    const toastId = toast(
-      ({ closeToast }) => (
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <p className="font-semibold">
-              Delete user?
-            </p>
-
-            <p className="text-sm">
-              Are you sure you want to delete{" "}
-              <strong>
-                {user.firstName} {user.lastName}
-              </strong>
-              ?
-            </p>
-          </div>
-
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => closeToast()}
-            >
-              Cancel
-            </Button>
-
-            <Button
-              type="button"
-              variant="destructive"
-              size="sm"
-              onClick={() => {
-                toast.dismiss(toastId);
-                mutation.mutate(user.id);
-              }}
-            >
-              Yes, delete
-            </Button>
-          </div>
-        </div>
-      ),
-      {
-        autoClose: false,
-        closeOnClick: false,
-        closeButton: false,
-        draggable: false,
-        position: "top-center",
-        toastId: "confirm-delete-user",
-      },
-    );
-  };
 
   return {
     ...mutation,
-    confirmDelete,
-    deletingUserId,
+    deletingUserId: mutation.isPending
+      ? mutation.variables
+      : null,
   };
 };
 

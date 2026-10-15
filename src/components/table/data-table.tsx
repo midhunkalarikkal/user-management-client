@@ -1,463 +1,460 @@
-
 import * as React from "react";
 import { useSearchParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 
 import {
-    useTable,
-    flexRender,
-    type RowData,
-    type ColumnVisibilityState,
+  useTable,
+  flexRender,
+  type RowData,
+  type ColumnVisibilityState,
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 
 import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import {
-    features,
-} from "./data-table-features";
+import { features } from "./data-table-features";
 import { SORT_ORDERS } from "@/utils/constant";
 
-import type {
-    SortOrder,
-    UserSortField,
-    GetUsersQueryParams,
-} from "@/types/user";
+import type { SortOrder, UserSortField, GetUsersQueryParams } from "@/types/user";
 import { isValidValue } from "@/utils/helper/isValidValue";
 import type { DataTableProps } from "@/types/components";
 
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+
+import type { UserSearchField } from "@/utils/constant";
+
 // Reads a positive integer from URL parameters.
-function getPositiveInteger(
-    value: string | null,
-    fallback: number
-): number {
-    if (!value || !/^\d+$/.test(value)) {
-        return fallback;
-    }
+function getPositiveInteger(value: string | null, fallback: number): number {
+  if (!value || !/^\d+$/.test(value)) {
+    return fallback;
+  }
 
-    const parsed = Number(value);
+  const parsed = Number(value);
 
-    return Number.isSafeInteger(parsed) && parsed > 0
-        ? parsed
-        : fallback;
+  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback;
 }
 
 // Renders a reusable API-driven table.
 export default function DataTable<TData extends RowData>({
-    columns,
-    queryFunction,
-    queryKey,
-    sortByConstants,
-    emptyMessage = "No records found.",
-    getRowId,
+  columns,
+  queryFunction,
+  queryKey,
+  sortByConstants,
+  searchByConstants = [],
+  emptyMessage = "No records found.",
+  getRowId,
 }: DataTableProps<TData>) {
-    const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-    // Reads pagination from the URL.
-    const page = getPositiveInteger(
-        searchParams.get("page"),
-        1
-    );
+  // Reads pagination from the URL.
+  const page = getPositiveInteger(searchParams.get("page"), 1);
+  const limit = Math.min(getPositiveInteger(searchParams.get("limit"), 10), 100);
 
-    const limit = Math.min(
-        getPositiveInteger(
-            searchParams.get("limit"),
-            10
-        ),
-        100
-    );
+  // Validates sorting parameters.
+  const sortByParam = searchParams.get("sortBy");
+  const orderParam = searchParams.get("order");
+  const searchKeyParam = searchParams.get("searchKey");
+  const searchValueParam = searchParams.get("searchValue") ?? "";
 
-    // Validates sorting parameters.
-    const sortByParam = searchParams.get("sortBy");
-    const orderParam = searchParams.get("order");
+  const [searchInput, setSearchInput] = React.useState(searchValueParam);
 
-    const sortByValues = sortByConstants.map(
-        (item) => item.value
-    );
+  const sortByValues = sortByConstants.map((item) => item.value);
 
-    const orderValues = SORT_ORDERS.map(
-        (item) => item.value
-    );
+  const orderValues = SORT_ORDERS.map((item) => item.value);
 
-    const sortBy: UserSortField | undefined =
-        isValidValue(sortByParam, sortByValues)
-            ? sortByParam
-            : undefined;
+  const searchFields = searchByConstants.map((item) => item.value);
 
-    const order: SortOrder | undefined =
-        isValidValue(orderParam, orderValues)
-            ? orderParam
-            : undefined;
+  const searchKey: UserSearchField | undefined = isValidValue(searchKeyParam, searchFields)
+    ? searchKeyParam
+    : undefined;
 
-    // Creates the query parameters for the API.
-    const queryParams: GetUsersQueryParams = {
-        page,
-        limit,
-        sortBy,
-        order,
-    };
+  React.useEffect(() => {
+    setSearchInput(searchValueParam);
+  }, [searchValueParam]);
 
-    // Fetches records inside the reusable table.
-    const {
-        data,
-        error,
-        isError,
-        isPending,
-        isFetching,
-        refetch,
-    } = useQuery({
-        queryKey: [
-            queryKey,
-            page,
-            limit,
-            sortBy ?? null,
-            order ?? null,
-        ],
-        queryFn: ({ signal }) =>
-            queryFunction(queryParams, signal),
-    });
-
-    // Manages column visibility locally.
-    const [columnVisibility, setColumnVisibility] =
-        React.useState<ColumnVisibilityState>({});
-
-    // Always supplies an array to TanStack Table.
-    const tableData = React.useMemo(
-        () => data?.users ?? [],
-        [data]
-    );
-
-    const table = useTable({
-        features,
-        data: tableData,
-        columns,
-        ...(getRowId && {
-            getRowId: (row: TData) => getRowId(row),
-        }),
-        state: {
-            columnVisibility,
-        },
-        onColumnVisibilityChange: setColumnVisibility,
-    });
-
-    const rows = table.getRowModel().rows;
-
-    const total = data?.total ?? 0;
-    const totalPages = Math.max(
-        1,
-        Math.ceil(total / limit)
-    );
-
-    // Updates sorting and resets pagination.
-    function updateSorting(
-        key: "sortBy" | "order",
-        value: string | null
-    ) {
-        setSearchParams((previous) => {
-            const params = new URLSearchParams(previous);
-
-            if (value) {
-                params.set(key, value);
-            } else {
-                params.delete(key);
-            }
-
-            params.delete("page");
-
-            return params;
-        });
+  React.useEffect(() => {
+    if (!searchKey || searchInput === searchValueParam) {
+      return;
     }
 
-    // Clears the selected sorting options.
-    function clearSorting() {
-        setSearchParams((previous) => {
-            const params = new URLSearchParams(previous);
+    const timeout = window.setTimeout(() => {
+      setSearchParams((previous) => {
+        const params = new URLSearchParams(previous);
+        const value = searchInput.trim();
 
-            params.delete("sortBy");
-            params.delete("order");
-            params.delete("page");
-
-            return params;
-        });
-    }
-
-    // Updates the current page in the URL.
-    function changePage(nextPage: number) {
-        if (nextPage < 1 || nextPage > totalPages) {
-            return;
+        if (value) {
+          params.set("searchValue", value);
+        } else {
+          params.delete("searchValue");
         }
 
-        setSearchParams((previous) => {
-            const params = new URLSearchParams(previous);
+        params.delete("page");
 
-            params.set("page", String(nextPage));
-            params.set("limit", String(limit));
+        return params;
+      });
+    }, 1000);
 
-            return params;
-        });
+    return () => window.clearTimeout(timeout);
+  }, [searchInput, searchValueParam, searchKey, setSearchParams]);
+
+  const sortBy: UserSortField | undefined = isValidValue(sortByParam, sortByValues)
+    ? sortByParam
+    : undefined;
+
+  const order: SortOrder | undefined = isValidValue(orderParam, orderValues)
+    ? orderParam
+    : undefined;
+
+  // Creates the query parameters for the API.
+  const queryParams: GetUsersQueryParams = {
+    page,
+    limit,
+    sortBy,
+    order,
+    searchValue: searchKey ? searchValueParam : undefined,
+  };
+
+  // Fetches records inside the reusable table.
+  const { data, error, isError, isPending, isFetching, refetch } = useQuery({
+    queryKey: [
+      queryKey,
+      page,
+      limit,
+      sortBy ?? null,
+      order ?? null,
+      searchKey ?? null,
+      searchKey ? searchValueParam : null,
+    ],
+    queryFn: ({ signal }) => queryFunction(queryParams, signal),
+  });
+
+  // Updates the search field and resets the current search.
+  function handleSearchFieldChange(value: string | null) {
+    setSearchInput("");
+
+    setSearchParams((previous) => {
+      const params = new URLSearchParams(previous);
+
+      if (value) {
+        params.set("searchKey", value);
+      } else {
+        params.delete("searchKey");
+      }
+
+      params.delete("searchValue");
+      params.delete("page");
+
+      return params;
+    });
+  }
+
+  // Removes the selected search field and value.
+  function clearSearch() {
+    setSearchInput("");
+
+    setSearchParams((previous) => {
+      const params = new URLSearchParams(previous);
+
+      params.delete("searchKey");
+      params.delete("searchValue");
+      params.delete("page");
+
+      return params;
+    });
+  }
+
+  // Manages column visibility locally.
+  const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibilityState>({});
+
+  // Always supplies an array to TanStack Table.
+  const tableData = React.useMemo(() => data?.users ?? [], [data]);
+
+  const table = useTable({
+    features,
+    data: tableData,
+    columns,
+    ...(getRowId && {
+      getRowId: (row: TData) => getRowId(row),
+    }),
+    state: {
+      columnVisibility,
+    },
+    onColumnVisibilityChange: setColumnVisibility,
+  });
+
+  const rows = table.getRowModel().rows;
+
+  const total = data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+
+  // Updates sorting and resets pagination.
+  function updateSorting(key: "sortBy" | "order", value: string | null) {
+    setSearchParams((previous) => {
+      const params = new URLSearchParams(previous);
+
+      if (value) {
+        params.set(key, value);
+
+        if (key === "sortBy" && !params.get("order")) {
+          params.set("order", "asc");
+        }
+      } else {
+        params.delete(key);
+
+        if (key === "sortBy") {
+          params.delete("order");
+        }
+      }
+
+      params.delete("page");
+
+      return params;
+    });
+  }
+
+  // Clears the selected sorting options.
+  function clearSorting() {
+    setSearchParams((previous) => {
+      const params = new URLSearchParams(previous);
+
+      params.delete("sortBy");
+      params.delete("order");
+      params.delete("page");
+
+      return params;
+    });
+  }
+
+  // Updates the current page in the URL.
+  function changePage(nextPage: number) {
+    if (nextPage < 1 || nextPage > totalPages) {
+      return;
     }
 
-    const start =
-        total === 0 ? 0 : (page - 1) * limit + 1;
+    setSearchParams((previous) => {
+      const params = new URLSearchParams(previous);
 
-    const end = Math.min(page * limit, total);
+      params.set("page", String(nextPage));
+      params.set("limit", String(limit));
 
-    const columnCount = Math.max(
-        table.getVisibleLeafColumns().length,
-        1
-    );
+      return params;
+    });
+  }
 
-    return (
-        <div className="space-y-4">
-            {/* Sorting and column visibility controls */}
-            <div className="flex flex-wrap items-center gap-3">
-                <Select
-                    value={sortBy ?? ""}
-                    onValueChange={(value) =>
-                        updateSorting("sortBy", value)
-                    }
+  const start = total === 0 ? 0 : (page - 1) * limit + 1;
+
+  const end = Math.min(page * limit, total);
+
+  const columnCount = Math.max(table.getVisibleLeafColumns().length, 1);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <Select value={sortBy ?? ""} onValueChange={(value) => updateSorting("sortBy", value)}>
+          <SelectTrigger className="w-44">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+
+          <SelectContent>
+            {sortByConstants.map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                {item.key}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={order ?? ""} onValueChange={(value) => updateSorting("order", value)}>
+          <SelectTrigger className="w-44">
+            <SelectValue placeholder="Order" />
+          </SelectTrigger>
+
+          <SelectContent>
+            {SORT_ORDERS.map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                {item.key}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {(sortBy || order) && (
+          <Button variant="outline" className="cursor-pointer" onClick={clearSorting}>
+            Clear sort
+          </Button>
+        )}
+
+        {searchByConstants.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={searchKey ?? ""} onValueChange={handleSearchFieldChange}>
+              <SelectTrigger className="w-44">
+                <SelectValue placeholder="Search field" />
+              </SelectTrigger>
+
+              <SelectContent>
+                {searchByConstants.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.key}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+
+              <Input
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                disabled={!searchKey}
+                placeholder={searchKey ? "Enter search value..." : "Select a field first"}
+                aria-label="Search value"
+                className="w-56 pl-9"
+              />
+            </div>
+
+            {(searchKey || searchValueParam) && (
+              <Button variant="outline" size="sm" onClick={clearSearch}>
+                Clear search
+              </Button>
+            )}
+          </div>
+        )}
+
+        <DropdownMenu>
+          <DropdownMenuTrigger render={<Button variant="outline" size="sm" className="ml-auto" />}>
+            Columns
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent align="end">
+            {table
+              .getAllLeafColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => (
+                <DropdownMenuCheckboxItem
+                  key={column.id}
+                  checked={column.getIsVisible()}
+                  onCheckedChange={(checked) => column.toggleVisibility(checked)}
+                  className="capitalize"
                 >
-                    <SelectTrigger className="w-44">
-                        <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
+                  {column.id}
+                </DropdownMenuCheckboxItem>
+              ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
-                    <SelectContent>
-                        {sortByConstants.map((item) => (
-                            <SelectItem
-                                key={item.value}
-                                value={item.value}
-                            >
-                                {item.key}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+      <div className="overflow-x-auto rounded-xl border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
 
-                <Select
-                    value={order ?? ""}
-                    onValueChange={(value) =>
-                        updateSorting("order", value)
-                    }
-                >
-                    <SelectTrigger className="w-44">
-                        <SelectValue placeholder="Order" />
-                    </SelectTrigger>
+          <TableBody>
+            {isPending ? (
+              <TableRow>
+                <TableCell colSpan={columnCount} className="h-32 text-center text-muted-foreground">
+                  Loading records...
+                </TableCell>
+              </TableRow>
+            ) : isError ? (
+              <TableRow>
+                <TableCell colSpan={columnCount} className="h-32 text-center">
+                  <div className="space-y-3">
+                    <p className="font-medium">Failed to load records</p>
 
-                    <SelectContent>
-                        {SORT_ORDERS.map((item) => (
-                            <SelectItem
-                                key={item.value}
-                                value={item.value}
-                            >
-                                {item.key}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                    <p className="text-sm text-muted-foreground">{error.message}</p>
 
-                {(sortBy || order) && (
-                    <Button
-                        variant="outline"
-                        className="cursor-pointer"
-                        onClick={clearSorting}
-                    >
-                        Clear sort
+                    <Button variant="outline" onClick={() => void refetch()}>
+                      Try again
                     </Button>
-                )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : rows.length > 0 ? (
+              rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columnCount} className="h-32 text-center text-muted-foreground">
+                  {emptyMessage}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger
-                        render={
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="ml-auto"
-                            />
-                        }
-                    >
-                        Columns
-                    </DropdownMenuTrigger>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">
+          {isPending || isError ? "Results unavailable" : `Showing ${start}-${end} of ${total}`}
+          {isFetching && !isPending ? " · Updating..." : ""}
+        </p>
 
-                    <DropdownMenuContent align="end">
-                        {table
-                            .getAllLeafColumns()
-                            .filter((column) =>
-                                column.getCanHide()
-                            )
-                            .map((column) => (
-                                <DropdownMenuCheckboxItem
-                                    key={column.id}
-                                    checked={column.getIsVisible()}
-                                    onCheckedChange={(checked) =>
-                                        column.toggleVisibility(checked)
-                                    }
-                                    className="capitalize"
-                                >
-                                    {column.id}
-                                </DropdownMenuCheckboxItem>
-                            ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-muted-foreground">
+            Page {page} of {totalPages}
+          </span>
 
-            {/* Table */}
-            <div className="overflow-x-auto rounded-xl border">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map(
-                            (headerGroup) => (
-                                <TableRow key={headerGroup.id}>
-                                    {headerGroup.headers.map(
-                                        (header) => (
-                                            <TableHead key={header.id}>
-                                                {header.isPlaceholder
-                                                    ? null
-                                                    : flexRender(
-                                                        header.column.columnDef.header,
-                                                        header.getContext()
-                                                    )}
-                                            </TableHead>
-                                        )
-                                    )}
-                                </TableRow>
-                            )
-                        )}
-                    </TableHeader>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page <= 1 || isPending || isError}
+            onClick={() => changePage(page - 1)}
+          >
+            Previous
+          </Button>
 
-                    <TableBody>
-                        {isPending ? (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columnCount}
-                                    className="h-32 text-center text-muted-foreground"
-                                >
-                                    Loading records...
-                                </TableCell>
-                            </TableRow>
-                        ) : isError ? (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columnCount}
-                                    className="h-32 text-center"
-                                >
-                                    <div className="space-y-3">
-                                        <p className="font-medium">
-                                            Failed to load records
-                                        </p>
-
-                                        <p className="text-sm text-muted-foreground">
-                                            {error.message}
-                                        </p>
-
-                                        <Button
-                                            variant="outline"
-                                            onClick={() =>
-                                                void refetch()
-                                            }
-                                        >
-                                            Try again
-                                        </Button>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ) : rows.length > 0 ? (
-                            rows.map((row) => (
-                                <TableRow key={row.id}>
-                                    {row
-                                        .getVisibleCells()
-                                        .map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columnCount}
-                                    className="h-32 text-center text-muted-foreground"
-                                >
-                                    {emptyMessage}
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
-
-            {/* Pagination */}
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm text-muted-foreground">
-                    {isPending || isError
-                        ? "Results unavailable"
-                        : `Showing ${start}-${end} of ${total}`}
-                    {isFetching && !isPending
-                        ? " · Updating..."
-                        : ""}
-                </p>
-
-                <div className="flex items-center gap-3">
-                    <span className="text-sm text-muted-foreground">
-                        Page {page} of {totalPages}
-                    </span>
-
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={
-                            page <= 1 ||
-                            isPending ||
-                            isError
-                        }
-                        onClick={() =>
-                            changePage(page - 1)
-                        }
-                    >
-                        Previous
-                    </Button>
-
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={
-                            page >= totalPages ||
-                            isPending ||
-                            isError
-                        }
-                        onClick={() =>
-                            changePage(page + 1)
-                        }
-                    >
-                        Next
-                    </Button>
-                </div>
-            </div>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page >= totalPages || isPending || isError}
+            onClick={() => changePage(page + 1)}
+          >
+            Next
+          </Button>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

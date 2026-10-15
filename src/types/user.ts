@@ -1,4 +1,4 @@
-import type { UserSearchLabel } from "@/utils/constant";
+import type { UserSearchField } from "@/utils/constant";
 
 // User location coordinates
 export interface Coordinates {
@@ -123,6 +123,8 @@ export interface GetUsersQueryParams {
   limit: number;
   sortBy?: UserSortField;
   order?: SortOrder;
+  searchKey?: UserSearchField;
+  searchValue?: string;
 }
 
 // Paginated API response
@@ -131,4 +133,10 @@ export interface ApiPaginatedResponse<TData> {
   total: number;
   skip: number;
   limit: number;
+}
+
+// rResponse returned by dummy json after deletion.
+export interface DeleteUserResponse extends User {
+  isDeleted: boolean;
+  deletedOn: string;
 }

@@ -3,21 +3,21 @@ import { UserPlus, UsersRound, type LucideIcon } from "lucide-react";
 
 // Sidebar navigation options
 export const navigationItems: {
-    title: string;
-    url: string;
-    icon: LucideIcon
+  title: string;
+  url: string;
+  icon: LucideIcon;
 }[] = [
-        {
-            title: "Users",
-            url: "/users",
-            icon: UsersRound,
-        },
-        {
-            title: "Add User",
-            url: "/users/new",
-            icon: UserPlus,
-        },
-    ];
+  {
+    title: "Users",
+    url: "/users",
+    icon: UsersRound,
+  },
+  {
+    title: "Add User",
+    url: "/users/new",
+    icon: UserPlus,
+  },
+];
 
 // User sorting fields
 export const USERS_SORT_BY = [
@@ -37,7 +37,6 @@ export const SORT_ORDERS = [
   key: string;
   value: SortOrder;
 }>;
-
 
 export const USERS_FILTER_BY = [
   { key: "Gender", value: "gender" },
@@ -88,8 +87,6 @@ export const USERS_SEARCH_FIELDS = [
   { key: "Company longitude", value: "company.address.coordinates.lng" },
 ] as const;
 
-export type UserSearchField =
-  (typeof USERS_SEARCH_FIELDS)[number]["value"];
+export type UserSearchField = (typeof USERS_SEARCH_FIELDS)[number]["value"];
 
-export type UserSearchLabel =
-  (typeof USERS_SEARCH_FIELDS)[number]["key"];
+export type UserSearchLabel = (typeof USERS_SEARCH_FIELDS)[number]["key"];

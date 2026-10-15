@@ -1,53 +1,46 @@
 
-import {
-  createColumnHelper,
-} from "@tanstack/react-table";
-
+import { createColumnHelper } from "@tanstack/react-table";
 import {
   Eye,
-  MoreHorizontal,
   Pencil,
   Trash2,
+  MoreHorizontal,
+  LoaderCircle,
 } from "lucide-react";
 
-import type {
-  UsersTableColumn,
-} from "@/types/user";
-
-import type {
-  DataTableFeatures,
-} from "../data-table-features";
+import type { UsersTableColumn } from "@/types/user";
+import type { DataTableFeatures } from "../data-table-features";
 
 import { Button } from "@/components/ui/button";
-
 import {
   DropdownMenu,
   DropdownMenuItem,
+  DropdownMenuGroup,
   DropdownMenuLabel,
-  DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-const columnHelper =
-  createColumnHelper<
-    DataTableFeatures,
-    UsersTableColumn
-  >();
+const columnHelper = createColumnHelper<
+  DataTableFeatures,
+  UsersTableColumn
+>();
 
-// Builds user columns with action callbacks.
+// User columns with action handlers and loading states.
 const UsersTableColumns = (
   onViewDetails: (userId: number) => void,
   onEditUser: (userId: number) => void,
-  onDeleteUser: (user: UsersTableColumn) => void
+  onDeleteUser: (user: UsersTableColumn) => void,
+  deletingUserId: number | null = null,
+  editingUserId: number | null = null,
 ) =>
   columnHelper.columns([
     columnHelper.accessor("firstName", {
       header: "First Name",
       cell: ({ row }) => (
         <span className="font-medium">
-          {row.original.firstName}{" "}
-          {row.original.lastName}
+          {row.original.firstName} {row.original.lastName}
         </span>
       ),
     }),
@@ -82,6 +75,41 @@ const UsersTableColumns = (
       cell: ({ row }) => {
         const user = row.original;
 
+        const isDeleting = deletingUserId === user.id;
+        const isEditing = editingUserId === user.id;
+        const isUpdating = isDeleting || isEditing;
+
+        if (isUpdating) {
+          return (
+            <div
+              role="status"
+              aria-live="polite"
+              className="flex min-w-36 items-center gap-2"
+            >
+              <LoaderCircle
+                aria-hidden="true"
+                className={`size-4 shrink-0 animate-spin ${
+                  isDeleting
+                    ? "text-destructive"
+                    : "text-primary"
+                }`}
+              />
+
+              <span
+                className={`text-xs font-medium whitespace-nowrap ${
+                  isDeleting
+                    ? "text-destructive"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {isDeleting
+                  ? "Deleting user..."
+                  : "Updating user..."}
+              </span>
+            </div>
+          );
+        }
+
         return (
           <DropdownMenu>
             <DropdownMenuTrigger
@@ -89,8 +117,8 @@ const UsersTableColumns = (
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="size-8 cursor-pointer"
                   aria-label={`Actions for ${user.firstName}`}
+                  className="size-8 cursor-pointer"
                 />
               }
             >
@@ -98,40 +126,37 @@ const UsersTableColumns = (
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>
-                Actions
-              </DropdownMenuLabel>
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>
+                  User actions
+                </DropdownMenuLabel>
 
-              <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => onViewDetails(user.id)}
+                  className="cursor-pointer"
+                >
+                  <Eye className="size-4" />
+                  View details
+                </DropdownMenuItem>
 
-              <DropdownMenuItem
-                onClick={() =>
-                  onViewDetails(user.id)
-                }
-              >
-                <Eye className="size-4" />
-                Details
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                onClick={() =>
-                  onEditUser(user.id)
-                }
-              >
-                <Pencil className="size-4" />
-                Edit
-              </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => onEditUser(user.id)}
+                  className="cursor-pointer"
+                >
+                  <Pencil className="size-4" />
+                  Edit user
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
 
               <DropdownMenuSeparator />
 
               <DropdownMenuItem
                 variant="destructive"
-                onClick={() =>
-                  onDeleteUser(user)
-                }
+                onClick={() => onDeleteUser(user)}
+                className="cursor-pointer"
               >
                 <Trash2 className="size-4" />
-                Delete
+                Delete user
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

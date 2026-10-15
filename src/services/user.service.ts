@@ -2,33 +2,41 @@ import { api } from "@/lib/axios";
 import type {
   User,
   UsersTableColumn,
+  DeleteUserResponse,
   GetUsersQueryParams,
   ApiPaginatedResponse,
 } from "@/types/user";
 
-// fet paginated list of users.
+// fetch paginated list of users.
 export async function getUsers(
   queryParams: GetUsersQueryParams,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<ApiPaginatedResponse<UsersTableColumn>> {
-  const {
-    page,
-    limit,
-    sortBy,
-    order,
-  } = queryParams;
+  const { page, limit, sortBy, order, searchKey, searchValue } = queryParams;
 
   const skip = (page - 1) * limit;
+  let params;
 
-  const { data } = await api.get<
-    ApiPaginatedResponse<UsersTableColumn>
-  >("/users", {
-    params: {
+  if (searchKey || searchValue) {
+    const value = searchValue?.trim();
+    params = {
       limit,
       skip,
       ...(sortBy && { sortBy }),
       ...(sortBy && { order: order ?? "asc" }),
-    },
+      key: value,
+    };
+  } else {
+    params = {
+      limit,
+      skip,
+      ...(sortBy && { sortBy }),
+      ...(sortBy && { order: order ?? "asc" }),
+    };
+  }
+
+  const { data } = await api.get<ApiPaginatedResponse<UsersTableColumn>>("/users", {
+    params,
     signal,
   });
 
@@ -36,14 +44,20 @@ export async function getUsers(
 }
 
 // fetch a single user.
-export async function getUserById(
-  userId: number,
-  signal?: AbortSignal
-): Promise<User> {
-  const { data } = await api.get<User>(
-    `/users/${userId}`,
-    { signal }
-  );
+export async function getUserById(userId: number, signal?: AbortSignal): Promise<User> {
+  const { data } = await api.get<User>(`/users/${userId}`, { signal });
 
   return data;
 }
+
+
+// Delete request for the selected user.
+export const deleteUser = async (
+  userId: User["id"],
+): Promise<DeleteUserResponse> => {
+  const { data } = await api.delete<DeleteUserResponse>(
+    `/users/${userId}`,
+  );
+
+  return data;
+};

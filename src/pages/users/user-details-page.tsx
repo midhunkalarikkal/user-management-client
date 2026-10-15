@@ -1,4 +1,3 @@
-
 import { Link, useParams } from "react-router";
 
 export default function UserDetailsPage() {
@@ -10,13 +9,9 @@ export default function UserDetailsPage() {
         Back to Users
       </Link>
 
-      <h1 className="mt-6 text-3xl font-bold">
-        User Details
-      </h1>
+      <h1 className="mt-6 text-3xl font-bold">User Details</h1>
 
-      <p className="mt-4">
-        Selected User ID: {userId}
-      </p>
+      <p className="mt-4">Selected User ID: {userId}</p>
     </main>
   );
 }

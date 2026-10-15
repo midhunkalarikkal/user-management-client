@@ -1,7 +1,4 @@
-import {
-    Navigate,
-  createBrowserRouter,
-} from "react-router";
+import { Navigate, createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import UsersPage from "@/pages/users/users-page";
 import AppLayout from "@/components/layout/app-layout";

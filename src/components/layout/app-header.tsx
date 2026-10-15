@@ -1,20 +1,13 @@
-
 import { useMatches } from "react-router";
 import type { RouteMetadata } from "@/types/components";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function AppHeader() {
-
   const matches = useMatches();
 
   const currentRoute = [...matches]
     .reverse()
-    .find(
-      (match) =>
-        match.handle &&
-        typeof match.handle === "object" &&
-        "title" in match.handle
-    );
+    .find((match) => match.handle && typeof match.handle === "object" && "title" in match.handle);
 
   const metadata = currentRoute?.handle as RouteMetadata | undefined;
 
@@ -26,20 +19,14 @@ export default function AppHeader() {
       <SidebarTrigger className="shrink-0" />
 
       <div className="min-w-0 text-center">
-        <h1 className="truncate text-sm font-semibold tracking-tight sm:text-base">
-          {title}
-        </h1>
+        <h1 className="truncate text-sm font-semibold tracking-tight sm:text-base">{title}</h1>
 
         {description && (
-          <p className="hidden truncate text-xs text-muted-foreground sm:block">
-            {description}
-          </p>
+          <p className="hidden truncate text-xs text-muted-foreground sm:block">{description}</p>
         )}
       </div>
 
-      <div className="text-xs text-muted-foreground">
-        Guest
-      </div>
+      <div className="text-xs text-muted-foreground">Guest</div>
     </header>
   );
 }

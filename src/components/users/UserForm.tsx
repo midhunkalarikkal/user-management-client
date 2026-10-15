@@ -10,9 +10,9 @@ import {
   getUserFormValues,
   type UserFormValues,
 } from "@/schemas/user.schema";
-import { USER_FORM_SECTIONS } from "./user-form-fields";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { USER_FORM_SECTIONS } from "./user-form-fields";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -22,8 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CREATE_ONLY_REQUIRED_FIELDS, REQUIRED_FIELDS } from "@/utils/constant";
 import type { UserFormField, UserFormProps } from "@/types/components";
+import { CREATE_ONLY_REQUIRED_FIELDS, REQUIRED_FIELDS } from "@/utils/constant";
 
 // reusing form for creating and updating users.
 const UserForm = ({ user, isSubmitting = false, onSubmit }: UserFormProps) => {

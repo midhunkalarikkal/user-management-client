@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useSearchParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-
 import {
   useTable,
   flexRender,
@@ -9,7 +8,6 @@ import {
   type ColumnVisibilityState,
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-
 import {
   Table,
   TableBody,
@@ -18,7 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import {
   Select,
   SelectContent,
@@ -26,25 +23,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import { features } from "./data-table-features";
-import { SORT_ORDERS } from "@/utils/constant";
-
-import type { SortOrder, UserSortField, GetUsersQueryParams } from "@/types/user";
-import { isValidValue } from "@/utils/helper/isValidValue";
-import type { DataTableProps } from "@/types/components";
-
-import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-
-import type { UserSearchField } from "@/utils/constant";
+import { Input } from "@/components/ui/input";
+import { SORT_ORDERS } from "@/utils/constant";
+import { features } from "./data-table-features";
+import type { UserSearchField } from "@/types/common";
+import type { DataTableProps } from "@/types/components";
+import { isValidValue } from "@/utils/helper/isValidValue";
+import type { SortOrder, UserSortField, GetUsersQueryParams } from "@/types/user";
 
 // Reads a positive integer from URL parameters.
 function getPositiveInteger(value: string | null, fallback: number): number {

@@ -87,6 +87,14 @@ export const USERS_SEARCH_FIELDS = [
   { key: "Company longitude", value: "company.address.coordinates.lng" },
 ] as const;
 
-export type UserSearchField = (typeof USERS_SEARCH_FIELDS)[number]["value"];
-
-export type UserSearchLabel = (typeof USERS_SEARCH_FIELDS)[number]["key"];
+// required user form fields
+export const REQUIRED_FIELDS = new Set([
+    "image",
+    "firstName",
+    "lastName",
+    "email",
+    "age",
+    "username",
+    "gender",
+    "role",
+]);

@@ -1,4 +1,5 @@
-import type { UserSearchField } from "@/utils/constant";
+import type { UserSearchField } from "@/types/common";
+import type { UserFormValues } from "@/schemas/user.schema";
 
 // User location coordinates
 export interface Coordinates {
@@ -114,7 +115,7 @@ export interface UsersSort {
 // Users table data
 export type UsersTableColumn = Pick<
   User,
-  "id" | "firstName" | "lastName" | "age" | "email" | "role"
+  "id" | "firstName" | "lastName" | "age" | "email" | "role" | "image"
 >;
 
 // Get users query parameters
@@ -135,8 +136,14 @@ export interface ApiPaginatedResponse<TData> {
   limit: number;
 }
 
-// rResponse returned by dummy json after deletion.
+// Response returned by dummy json after deletion.
 export interface DeleteUserResponse extends User {
   isDeleted: boolean;
   deletedOn: string;
+}
+
+// Parameters for updating an existing user.
+export interface UpdateUserParams {
+  userId: User["id"];
+  values: UserFormValues;
 }

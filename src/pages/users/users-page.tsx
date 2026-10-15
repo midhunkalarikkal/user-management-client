@@ -13,7 +13,6 @@ const UsersPage = () => {
 
   const navigate = useNavigate();
   const { confirmDelete, deletingUserId } = useDeleteUser();
-  const editingUserId: number | null = null;
   const [selectedUser, setSelectedUser] = useState<UsersTableColumn | null>(null);
 
   const handleViewDetails = useCallback(
@@ -38,8 +37,8 @@ const UsersPage = () => {
   );
 
   const columns = useMemo(
-    () => UsersTableColumns(handleViewDetails, handleEditUser, handleDeleteUser, deletingUserId, editingUserId),
-    [handleViewDetails, handleEditUser, handleDeleteUser, deletingUserId, editingUserId],
+    () => UsersTableColumns(handleViewDetails, handleEditUser, handleDeleteUser, deletingUserId),
+    [handleViewDetails, handleEditUser, handleDeleteUser, deletingUserId],
   );
 
   return (

@@ -1,4 +1,3 @@
-
 import { createColumnHelper } from "@tanstack/react-table";
 import {
   Eye,
@@ -7,10 +6,8 @@ import {
   MoreHorizontal,
   LoaderCircle,
 } from "lucide-react";
-
 import type { UsersTableColumn } from "@/types/user";
 import type { DataTableFeatures } from "../data-table-features";
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,6 +18,11 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+} from "@/components/ui/avatar";
 
 const columnHelper = createColumnHelper<
   DataTableFeatures,
@@ -33,9 +35,33 @@ const UsersTableColumns = (
   onEditUser: (userId: number) => void,
   onDeleteUser: (user: UsersTableColumn) => void,
   deletingUserId: number | null = null,
-  editingUserId: number | null = null,
 ) =>
   columnHelper.columns([
+    
+columnHelper.accessor("image", {
+  header: "Profile",
+  enableHiding: false,
+  cell: ({ row }) => {
+    const user = row.original;
+
+    const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+
+    return (
+      <Avatar className="size-10 border bg-muted">
+        <AvatarImage
+          src={user.image || undefined}
+          alt={`${user.firstName} ${user.lastName}`}
+          className="object-cover"
+        />
+        <AvatarFallback className="text-xs font-medium">
+          {initials}
+        </AvatarFallback>
+      </Avatar>
+    );
+  },
+}),
+
+
     columnHelper.accessor("firstName", {
       header: "First Name",
       cell: ({ row }) => (
@@ -76,8 +102,7 @@ const UsersTableColumns = (
         const user = row.original;
 
         const isDeleting = deletingUserId === user.id;
-        const isEditing = editingUserId === user.id;
-        const isUpdating = isDeleting || isEditing;
+        const isUpdating = isDeleting;
 
         if (isUpdating) {
           return (

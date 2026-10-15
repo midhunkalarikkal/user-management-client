@@ -86,6 +86,8 @@ export interface User {
   role: UserRole;
 }
 
+export type UserDetailsResponse = Omit<User, "password">;
+
 // Users API response with pagination
 export interface UsersResponse {
   users: User[];

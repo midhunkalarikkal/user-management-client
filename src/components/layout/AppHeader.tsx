@@ -1,11 +1,11 @@
 import { useMatches } from "react-router";
 import type { RouteMetadata } from "@/types/components";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 import useAuthUser from "@/hooks/mutations/auth/use-auth-user";
 
 const AppHeader = () => {
   const matches = useMatches();
-
   const { data: user } = useAuthUser();
 
   const currentRoute = [...matches]
@@ -29,16 +29,17 @@ const AppHeader = () => {
         )}
       </div>
 
-      <div className="min-w-0 text-right">
-        <p className="truncate text-xs font-medium">
-          {user?.name ?? "Guest"}
-        </p>
-        <p className="hidden truncate text-xs text-muted-foreground sm:block">
-          {user?.email ?? ""}
-        </p>
+      <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+        <ThemeToggle />
+
+        <div className="hidden min-w-0 text-right sm:block">
+          <p className="truncate text-xs font-medium">{user?.name ?? "Guest"}</p>
+
+          <p className="truncate text-xs text-muted-foreground">{user?.email ?? ""}</p>
+        </div>
       </div>
     </header>
   );
-}
+};
 
 export default AppHeader;

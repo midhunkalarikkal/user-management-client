@@ -112,6 +112,7 @@ const DataTable = <TData extends RowData>({
     limit,
     sortBy,
     order,
+    searchKey,
     searchValue: searchKey ? searchValueParam : undefined,
   };
 
@@ -309,7 +310,7 @@ const DataTable = <TData extends RowData>({
             </div>
 
             {(searchKey || searchValueParam) && (
-              <Button variant="outline" size="sm" onClick={clearSearch}>
+              <Button variant="outline" className="cursor-pointer" onClick={clearSearch}>
                 Clear search
               </Button>
             )}
@@ -429,6 +430,6 @@ const DataTable = <TData extends RowData>({
       </div>
     </div>
   );
-}
+};
 
 export default DataTable;

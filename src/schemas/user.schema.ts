@@ -3,10 +3,7 @@ import type { User } from "@/types/user";
 import { toDateInputValue } from "@/utils/helper/convertApiDate";
 
 const optionalText = (max: number) =>
-  z
-    .string()
-    .trim()
-    .max(max, `Must not exceed ${max} characters`);
+  z.string().trim().max(max, `Must not exceed ${max} characters`);
 
 const requiredText = (label: string, max: number) =>
   z
@@ -15,15 +12,8 @@ const requiredText = (label: string, max: number) =>
     .min(1, `${label} is required`)
     .max(max, `${label} must not exceed ${max} characters`);
 
-const optionalPattern = (
-  max: number,
-  pattern: RegExp,
-  message: string,
-) =>
-  optionalText(max).refine(
-    (value) => value === "" || pattern.test(value),
-    message,
-  );
+const optionalPattern = (max: number, pattern: RegExp, message: string) =>
+  optionalText(max).refine((value) => value === "" || pattern.test(value), message);
 
 const latitude = z.number().finite().min(-90).max(90);
 const longitude = z.number().finite().min(-180).max(180);
@@ -38,10 +28,7 @@ const optionalPhone = optionalText(25).refine(
 );
 
 const optionalIp = optionalText(45).refine(
-  (value) =>
-    value === "" ||
-    z.ipv4().safeParse(value).success ||
-    z.ipv6().safeParse(value).success,
+  (value) => value === "" || z.ipv4().safeParse(value).success || z.ipv6().safeParse(value).success,
   "Enter a valid IPv4 or IPv6 address",
 );
 
@@ -51,16 +38,13 @@ const optionalMac = optionalPattern(
   "Enter a valid MAC address",
 );
 
-const optionalCardExpiry = optionalText(5).refine(
-  (value) => {
-    if (!value) return true;
+const optionalCardExpiry = optionalText(5).refine((value) => {
+  if (!value) return true;
 
-    const match = /^(0[1-9]|1[0-2])\/\d{2}$/.exec(value);
+  const match = /^(0[1-9]|1[0-2])\/\d{2}$/.exec(value);
 
-    return Boolean(match);
-  },
-  "Enter a valid expiry date in MM/YY format",
-);
+  return Boolean(match);
+}, "Enter a valid expiry date in MM/YY format");
 
 const addressSchema = z.object({
   address: optionalText(200),
@@ -68,11 +52,7 @@ const addressSchema = z.object({
   state: optionalText(100),
   stateCode: optionalText(20),
 
-  postalCode: optionalPattern(
-    20,
-    /^[\p{L}\p{N}\s-]+$/u,
-    "Enter a valid postal code",
-  ),
+  postalCode: optionalPattern(20, /^[\p{L}\p{N}\s-]+$/u, "Enter a valid postal code"),
 
   country: optionalText(100),
 
@@ -90,25 +70,13 @@ const hairSchema = z.object({
 const bankSchema = z.object({
   cardExpire: optionalCardExpiry,
 
-  cardNumber: optionalPattern(
-    19,
-    /^\d{12,19}$/,
-    "Card number must contain 12 to 19 digits",
-  ),
+  cardNumber: optionalPattern(19, /^\d{12,19}$/, "Card number must contain 12 to 19 digits"),
 
   cardType: optionalText(50),
 
-  currency: optionalPattern(
-    3,
-    /^[A-Z]{3}$/,
-    "Enter a valid 3-letter currency code",
-  ),
+  currency: optionalPattern(3, /^[A-Z]{3}$/, "Enter a valid 3-letter currency code"),
 
-  iban: optionalPattern(
-    34,
-    /^[A-Za-z0-9]+$/,
-    "IBAN must contain only letters and numbers",
-  ),
+  iban: optionalPattern(34, /^[A-Za-z0-9]+$/, "IBAN must contain only letters and numbers"),
 });
 
 const companySchema = z.object({
@@ -156,20 +124,13 @@ export const userFormSchema = z.object({
       "Username can only contain letters, numbers, dots, underscores and hyphens",
     ),
 
-  password: z
-    .string()
-    .max(128, "Password must not exceed 128 characters"),
+  password: z.string().max(128, "Password must not exceed 128 characters"),
 
   birthDate: z
     .string()
+    .refine((value) => value === "" || z.iso.date().safeParse(value).success, "Enter a valid date")
     .refine(
-      (value) =>
-        value === "" || z.iso.date().safeParse(value).success,
-      "Enter a valid date",
-    )
-    .refine(
-      (value) =>
-        value === "" || value <= new Date().toISOString().slice(0, 10),
+      (value) => value === "" || value <= new Date().toISOString().slice(0, 10),
       "Date of birth cannot be in the future",
     ),
 
@@ -180,11 +141,7 @@ export const userFormSchema = z.object({
     .max(2048, "Image URL must not exceed 2048 characters")
     .pipe(z.httpUrl("Enter a valid HTTP or HTTPS image URL")),
 
-  bloodGroup: optionalPattern(
-    3,
-    /^(A|B|AB|O)[+-]$/,
-    "Enter a valid blood group",
-  ),
+  bloodGroup: optionalPattern(3, /^(A|B|AB|O)[+-]$/, "Enter a valid blood group"),
 
   height: z
     .number()
@@ -226,118 +183,122 @@ export const createUserSchema = userFormSchema.extend({
     .max(128, "Password must not exceed 128 characters"),
 });
 
-export const editUserSchema = userFormSchema;
+export const updateUserSchema = userFormSchema.extend({
+  password: z
+    .string()
+    .max(128, "Password must not exceed 128 characters")
+    .refine(
+      (value) => value === "" || value.length >= 6,
+      "Password must contain at least 6 characters",
+    ),
+});
 
 export type UserFormValues = z.infer<typeof userFormSchema>;
 
 const emptyAddress = () => ({
-    address: "",
-    city: "",
-    state: "",
-    stateCode: "",
-    postalCode: "",
-    country: "",
-    coordinates: {
-        lat: 0,
-        lng: 0,
-    },
+  address: "",
+  city: "",
+  state: "",
+  stateCode: "",
+  postalCode: "",
+  country: "",
+  coordinates: {
+    lat: 0,
+    lng: 0,
+  },
 });
 
 // Creates an empty user form.
 export const getDefaultUserValues = (): UserFormValues => ({
-    firstName: "",
-    lastName: "",
-    maidenName: "",
-    age: 18,
-    gender: "other",
-    email: "",
-    phone: "",
-    username: "",
-    password: "",
-    birthDate: "",
-    image: "",
-    bloodGroup: "",
-    height: 0,
-    weight: 0,
-    eyeColor: "",
-    hair: {
-        color: "",
-        type: "",
-    },
-    ip: "",
+  firstName: "",
+  lastName: "",
+  maidenName: "",
+  age: 18,
+  gender: "other",
+  email: "",
+  phone: "",
+  username: "",
+  password: "",
+  birthDate: "",
+  image: "",
+  bloodGroup: "",
+  height: 0,
+  weight: 0,
+  eyeColor: "",
+  hair: {
+    color: "",
+    type: "",
+  },
+  ip: "",
+  address: emptyAddress(),
+  macAddress: "",
+  university: "",
+  bank: {
+    cardExpire: "",
+    cardNumber: "",
+    cardType: "",
+    currency: "",
+    iban: "",
+  },
+  company: {
+    department: "",
+    name: "",
+    title: "",
     address: emptyAddress(),
-    macAddress: "",
-    university: "",
-    bank: {
-        cardExpire: "",
-        cardNumber: "",
-        cardType: "",
-        currency: "",
-        iban: "",
-    },
-    company: {
-        department: "",
-        name: "",
-        title: "",
-        address: emptyAddress(),
-    },
-    ein: "",
-    ssn: "",
-    userAgent: "",
-    crypto: {
-        coin: "",
-        wallet: "",
-        network: "",
-    },
-    role: "user",
+  },
+  ein: "",
+  ssn: "",
+  userAgent: "",
+  crypto: {
+    coin: "",
+    wallet: "",
+    network: "",
+  },
+  role: "user",
 });
 
 // Maps an existing user into editable form values.
-export const getUserFormValues = (
-    user: User,
-): UserFormValues => {
+export const getUserFormValues = (user: Omit<User, "password">): UserFormValues => {
+  const { id: _id, ...values } = user;
 
-    const { id: _id, password: _password, ...values } = user;
+  void _id;
 
-    void _id;
-    void _password;
-
-    return {
-        ...getDefaultUserValues(),
-        ...values,
-        birthDate: toDateInputValue(user.birthDate),
-        password: "",
-        hair: {
-            ...getDefaultUserValues().hair,
-            ...user.hair,
+  return {
+    ...getDefaultUserValues(),
+    ...values,
+    birthDate: toDateInputValue(user.birthDate),
+    password: "",
+    hair: {
+      ...getDefaultUserValues().hair,
+      ...user.hair,
+    },
+    address: {
+      ...emptyAddress(),
+      ...user.address,
+      coordinates: {
+        ...emptyAddress().coordinates,
+        ...user.address?.coordinates,
+      },
+    },
+    bank: {
+      ...getDefaultUserValues().bank,
+      ...user.bank,
+    },
+    company: {
+      ...getDefaultUserValues().company,
+      ...user.company,
+      address: {
+        ...emptyAddress(),
+        ...user.company?.address,
+        coordinates: {
+          ...emptyAddress().coordinates,
+          ...user.company?.address?.coordinates,
         },
-        address: {
-            ...emptyAddress(),
-            ...user.address,
-            coordinates: {
-                ...emptyAddress().coordinates,
-                ...user.address?.coordinates,
-            },
-        },
-        bank: {
-            ...getDefaultUserValues().bank,
-            ...user.bank,
-        },
-        company: {
-            ...getDefaultUserValues().company,
-            ...user.company,
-            address: {
-                ...emptyAddress(),
-                ...user.company?.address,
-                coordinates: {
-                    ...emptyAddress().coordinates,
-                    ...user.company?.address?.coordinates,
-                },
-            },
-        },
-        crypto: {
-            ...getDefaultUserValues().crypto,
-            ...user.crypto,
-        },
-    };
+      },
+    },
+    crypto: {
+      ...getDefaultUserValues().crypto,
+      ...user.crypto,
+    },
+  };
 };

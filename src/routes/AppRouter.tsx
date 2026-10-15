@@ -73,7 +73,7 @@ const router = createBrowserRouter([
           },
         ],
       },
-    ]
+    ],
   },
   {
     path: "*",
@@ -86,15 +86,13 @@ const AppRouter = () => {
     <Suspense
       fallback={
         <div className="flex min-h-screen items-center justify-center">
-          <p className="text-sm text-muted-foreground">
-            Loading page...
-          </p>
+          <p className="text-sm text-muted-foreground">Loading page...</p>
         </div>
       }
     >
       <RouterProvider router={router} />
     </Suspense>
   );
-}
+};
 
 export default AppRouter;

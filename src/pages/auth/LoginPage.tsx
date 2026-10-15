@@ -12,22 +12,9 @@ import {
   UserRoundCheck,
   UsersRound,
 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  loginSchema,
-  type LoginFormValues,
-} from "@/schemas/auth.schema";
-import {
-  Field,
-  FieldError,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { loginSchema, type LoginFormValues } from "@/schemas/auth.schema";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import useLogin from "@/hooks/mutations/auth/use-login";
@@ -38,7 +25,6 @@ const DEMO_CREDENTIALS: LoginFormValues = {
 };
 
 const LoginPage = () => {
-    
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -90,13 +76,9 @@ const LoginPage = () => {
           </div>
 
           <div className="space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              User Management
-            </h1>
+            <h1 className="text-2xl font-semibold tracking-tight">User Management</h1>
 
-            <p className="text-sm text-muted-foreground">
-              Sign in to access your dashboard.
-            </p>
+            <p className="text-sm text-muted-foreground">Sign in to access your dashboard.</p>
           </div>
         </div>
 
@@ -106,13 +88,9 @@ const LoginPage = () => {
               <LockKeyhole className="size-5 text-muted-foreground" />
             </div>
 
-            <CardTitle className="text-xl">
-              Welcome back
-            </CardTitle>
+            <CardTitle className="text-xl">Welcome back</CardTitle>
 
-            <CardDescription>
-              Enter your credentials to continue.
-            </CardDescription>
+            <CardDescription>Enter your credentials to continue.</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6">
@@ -128,9 +106,7 @@ const LoginPage = () => {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="email">
-                      Email address
-                    </FieldLabel>
+                    <FieldLabel htmlFor="email">Email address</FieldLabel>
 
                     <div className="relative">
                       <Mail className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -148,11 +124,7 @@ const LoginPage = () => {
                       />
                     </div>
 
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                      />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -162,9 +134,7 @@ const LoginPage = () => {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="password">
-                      Password
-                    </FieldLabel>
+                    <FieldLabel htmlFor="password">Password</FieldLabel>
 
                     <div className="relative">
                       <LockKeyhole className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -185,29 +155,15 @@ const LoginPage = () => {
                         variant="ghost"
                         size="icon"
                         className="absolute top-1/2 right-1 size-8 -translate-y-1/2 cursor-pointer"
-                        onClick={() =>
-                          setShowPassword((previous) => !previous)
-                        }
+                        onClick={() => setShowPassword((previous) => !previous)}
                         disabled={isPending}
-                        aria-label={
-                          showPassword
-                            ? "Hide password"
-                            : "Show password"
-                        }
+                        aria-label={showPassword ? "Hide password" : "Show password"}
                       >
-                        {showPassword ? (
-                          <EyeOff className="size-4" />
-                        ) : (
-                          <Eye className="size-4" />
-                        )}
+                        {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                       </Button>
                     </div>
 
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                      />
-                    )}
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
@@ -235,30 +191,20 @@ const LoginPage = () => {
               <div className="flex items-center gap-2">
                 <UserRoundCheck className="size-4 text-muted-foreground" />
 
-                <p className="text-sm font-medium">
-                  Demo account
-                </p>
+                <p className="text-sm font-medium">Demo account</p>
               </div>
 
               <div className="space-y-3 rounded-lg border bg-muted/40 p-4">
                 <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">
-                    Email
-                  </p>
+                  <p className="text-xs text-muted-foreground">Email</p>
 
-                  <p className="text-sm font-medium">
-                    {DEMO_CREDENTIALS.email}
-                  </p>
+                  <p className="text-sm font-medium">{DEMO_CREDENTIALS.email}</p>
                 </div>
 
                 <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">
-                    Password
-                  </p>
+                  <p className="text-xs text-muted-foreground">Password</p>
 
-                  <p className="text-sm font-medium">
-                    {DEMO_CREDENTIALS.password}
-                  </p>
+                  <p className="text-sm font-medium">{DEMO_CREDENTIALS.password}</p>
                 </div>
 
                 <Button

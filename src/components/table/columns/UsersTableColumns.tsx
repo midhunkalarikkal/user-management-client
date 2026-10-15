@@ -1,16 +1,6 @@
 import { createColumnHelper } from "@tanstack/react-table";
-import {
-  Eye,
-  Pencil,
-  Trash2,
-  MoreHorizontal,
-  LoaderCircle,
-} from "lucide-react";
-import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-} from "@/components/ui/avatar";
+import { Eye, Pencil, Trash2, MoreHorizontal, LoaderCircle } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -24,10 +14,7 @@ import { Button } from "@/components/ui/button";
 import type { UsersTableColumn } from "@/types/user";
 import type { DataTableFeatures } from "../DataTableFeatures";
 
-const columnHelper = createColumnHelper<
-  DataTableFeatures,
-  UsersTableColumn
->();
+const columnHelper = createColumnHelper<DataTableFeatures, UsersTableColumn>();
 
 // User columns with action handlers and loading states.
 const UsersTableColumns = (
@@ -37,30 +24,26 @@ const UsersTableColumns = (
   deletingUserId: number | null = null,
 ) =>
   columnHelper.columns([
-    
-columnHelper.accessor("image", {
-  header: "Profile",
-  enableHiding: false,
-  cell: ({ row }) => {
-    const user = row.original;
+    columnHelper.accessor("image", {
+      header: "Profile",
+      enableHiding: false,
+      cell: ({ row }) => {
+        const user = row.original;
 
-    const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+        const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
 
-    return (
-      <Avatar className="size-10 border bg-muted">
-        <AvatarImage
-          src={user.image || undefined}
-          alt={`${user.firstName} ${user.lastName}`}
-          className="object-cover"
-        />
-        <AvatarFallback className="text-xs font-medium">
-          {initials}
-        </AvatarFallback>
-      </Avatar>
-    );
-  },
-}),
-
+        return (
+          <Avatar className="size-10 border bg-muted">
+            <AvatarImage
+              src={user.image || undefined}
+              alt={`${user.firstName} ${user.lastName}`}
+              className="object-cover"
+            />
+            <AvatarFallback className="text-xs font-medium">{initials}</AvatarFallback>
+          </Avatar>
+        );
+      },
+    }),
 
     columnHelper.accessor("firstName", {
       header: "First Name",
@@ -74,9 +57,7 @@ columnHelper.accessor("image", {
     columnHelper.accessor("email", {
       header: "Email",
       cell: ({ row }) => (
-        <span className="text-sm text-muted-foreground">
-          {row.original.email}
-        </span>
+        <span className="text-sm text-muted-foreground">{row.original.email}</span>
       ),
     }),
 
@@ -86,11 +67,7 @@ columnHelper.accessor("image", {
 
     columnHelper.accessor("role", {
       header: "Role",
-      cell: ({ row }) => (
-        <span className="capitalize">
-          {row.original.role}
-        </span>
-      ),
+      cell: ({ row }) => <span className="capitalize">{row.original.role}</span>,
     }),
 
     columnHelper.display({
@@ -106,30 +83,20 @@ columnHelper.accessor("image", {
 
         if (isUpdating) {
           return (
-            <div
-              role="status"
-              aria-live="polite"
-              className="flex min-w-36 items-center gap-2"
-            >
+            <div role="status" aria-live="polite" className="flex min-w-36 items-center gap-2">
               <LoaderCircle
                 aria-hidden="true"
                 className={`size-4 shrink-0 animate-spin ${
-                  isDeleting
-                    ? "text-destructive"
-                    : "text-primary"
+                  isDeleting ? "text-destructive" : "text-primary"
                 }`}
               />
 
               <span
                 className={`text-xs font-medium whitespace-nowrap ${
-                  isDeleting
-                    ? "text-destructive"
-                    : "text-muted-foreground"
+                  isDeleting ? "text-destructive" : "text-muted-foreground"
                 }`}
               >
-                {isDeleting
-                  ? "Deleting user..."
-                  : "Updating user..."}
+                {isDeleting ? "Deleting user..." : "Updating user..."}
               </span>
             </div>
           );
@@ -152,22 +119,14 @@ columnHelper.accessor("image", {
 
             <DropdownMenuContent align="end">
               <DropdownMenuGroup>
-                <DropdownMenuLabel>
-                  User actions
-                </DropdownMenuLabel>
+                <DropdownMenuLabel>User actions</DropdownMenuLabel>
 
-                <DropdownMenuItem
-                  onClick={() => onViewDetails(user.id)}
-                  className="cursor-pointer"
-                >
+                <DropdownMenuItem onClick={() => onViewDetails(user.id)} className="cursor-pointer">
                   <Eye className="size-4" />
                   View details
                 </DropdownMenuItem>
 
-                <DropdownMenuItem
-                  onClick={() => onEditUser(user.id)}
-                  className="cursor-pointer"
-                >
+                <DropdownMenuItem onClick={() => onEditUser(user.id)} className="cursor-pointer">
                   <Pencil className="size-4" />
                   Edit user
                 </DropdownMenuItem>

@@ -33,23 +33,17 @@ const CreateUserPage = () => {
         </Button>
 
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Add new user
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Add new user</h1>
 
           <p className="mt-1 text-sm text-muted-foreground">
-            Enter the user's personal, account, address,
-            employment, banking and other details.
+            Enter the user's personal, account, address, employment, banking and other details.
           </p>
         </div>
       </div>
 
-      <UserForm
-        onSubmit={handleCreateUser}
-        isSubmitting={isPending}
-      />
+      <UserForm onSubmit={handleCreateUser} isSubmitting={isPending} />
     </section>
   );
-}
+};
 
 export default CreateUserPage;

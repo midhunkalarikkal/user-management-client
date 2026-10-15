@@ -11,7 +11,7 @@ import { type RowData } from "@tanstack/react-table";
 import type { DataTableColumnHeaderProps } from "@/types/components";
 import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from "lucide-react";
 
-const DataTableColumnHeader = <TData extends RowData, TValue> ({
+const DataTableColumnHeader = <TData extends RowData, TValue>({
   column,
   title,
   className,
@@ -53,6 +53,6 @@ const DataTableColumnHeader = <TData extends RowData, TValue> ({
       </DropdownMenu>
     </div>
   );
-}
+};
 
-export default DataTableColumnHeader
+export default DataTableColumnHeader;

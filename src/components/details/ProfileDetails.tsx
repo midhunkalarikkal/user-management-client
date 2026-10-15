@@ -4,10 +4,8 @@ import { Card, CardContent } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Fingerprint, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 
-const UserProfile = ({ user }: { user: User }) => {
-    
-  const initials =
-    `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+const UserProfile = ({ user }: { user: Omit<User, "password"> }) => {
+  const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
 
   return (
     <Card className="gap-0 overflow-hidden py-0 shadow-none">
@@ -21,9 +19,7 @@ const UserProfile = ({ user }: { user: User }) => {
               alt={`${user.firstName} ${user.lastName}`}
               className="object-cover"
             />
-            <AvatarFallback className="text-xl font-semibold">
-              {initials}
-            </AvatarFallback>
+            <AvatarFallback className="text-xl font-semibold">{initials}</AvatarFallback>
           </Avatar>
 
           <Badge variant="secondary" className="w-fit capitalize">
@@ -38,9 +34,7 @@ const UserProfile = ({ user }: { user: User }) => {
               {user.firstName} {user.lastName}
             </h2>
 
-            <p className="mt-1 text-sm text-muted-foreground">
-              @{user.username}
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">@{user.username}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
@@ -65,9 +59,7 @@ const UserProfile = ({ user }: { user: User }) => {
               <span className="flex items-center gap-2">
                 <MapPin className="size-4" />
                 {user.address.city}
-                {user.address.country
-                  ? `, ${user.address.country}`
-                  : ""}
+                {user.address.country ? `, ${user.address.country}` : ""}
               </span>
             )}
           </div>
@@ -75,6 +67,6 @@ const UserProfile = ({ user }: { user: User }) => {
       </CardContent>
     </Card>
   );
-}
+};
 
 export default UserProfile;

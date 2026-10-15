@@ -28,5 +28,5 @@ const NotFoundPage = () => {
       </Button>
     </section>
   );
-}
+};
 export default NotFoundPage;

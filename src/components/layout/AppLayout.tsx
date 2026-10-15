@@ -17,6 +17,6 @@ const AppLayout = () => {
       </SidebarInset>
     </SidebarProvider>
   );
-}
+};
 
 export default AppLayout;

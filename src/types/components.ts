@@ -4,7 +4,13 @@ import type { UserSearchField } from "@/types/common";
 import type { UserFormValues } from "@/schemas/user.schema";
 import type { Column, ColumnDef, RowData } from "@tanstack/react-table";
 import type { DataTableFeatures } from "@/components/table/DataTableFeatures";
-import type { ApiPaginatedResponse, GetUsersQueryParams, User, UserSortField, UsersTableColumn } from "./user";
+import type {
+  ApiPaginatedResponse,
+  GetUsersQueryParams,
+  User,
+  UserSortField,
+  UsersTableColumn,
+} from "./user";
 
 // route handler metadata
 export interface RouteMetadata {
@@ -42,9 +48,9 @@ export interface DataTableProps<TData extends RowData> {
 
 // User form props
 export interface UserFormProps {
-    user?: User;
-    isSubmitting?: boolean;
-    onSubmit: (values: UserFormValues) => void | Promise<void>;
+  user?: Omit<User, "password">;
+  isSubmitting?: boolean;
+  onSubmit: (values: UserFormValues) => void | Promise<void>;
 }
 
 // User form fields interface
@@ -73,8 +79,7 @@ export interface DetailItemProps {
 }
 
 // Details section interface
-export 
-interface DetailsSectionProps {
+export interface DetailsSectionProps {
   title: string;
   description: string;
   icon: ReactNode;

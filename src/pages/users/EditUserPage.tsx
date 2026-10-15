@@ -12,8 +12,7 @@ const EditUserPage = () => {
   const { userId } = useParams();
 
   const id = Number(userId);
-  const isValidId =
-    Number.isSafeInteger(id) && id > 0;
+  const isValidId = Number.isSafeInteger(id) && id > 0;
 
   const {
     data: user,
@@ -27,15 +26,10 @@ const EditUserPage = () => {
     enabled: isValidId,
   });
 
-  const {
-    mutateAsync,
-    isPending: isUpdating,
-  } = useUpdateUser();
+  const { mutateAsync, isPending: isUpdating } = useUpdateUser();
 
   // Updates the selected user's details.
-  const handleUpdateUser = async (
-    values: UserFormValues,
-  ) => {
+  const handleUpdateUser = async (values: UserFormValues) => {
     if (!isValidId) return;
 
     try {
@@ -51,11 +45,7 @@ const EditUserPage = () => {
   };
 
   if (!isValidId) {
-    return (
-      <p className="text-sm text-destructive">
-        Invalid user ID.
-      </p>
-    );
+    return <p className="text-sm text-destructive">Invalid user ID.</p>;
   }
 
   if (isPending) {
@@ -69,18 +59,11 @@ const EditUserPage = () => {
   if (isError || !user) {
     return (
       <div className="space-y-3 text-center">
-        <p className="font-medium">
-          Unable to load user details.
-        </p>
+        <p className="font-medium">Unable to load user details.</p>
 
-        <p className="text-sm text-muted-foreground">
-          {error?.message}
-        </p>
+        <p className="text-sm text-muted-foreground">{error?.message}</p>
 
-        <Button
-          variant="outline"
-          onClick={() => void refetch()}
-        >
+        <Button variant="outline" onClick={() => void refetch()}>
           Try again
         </Button>
       </div>
@@ -101,25 +84,17 @@ const EditUserPage = () => {
         </Button>
 
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Edit user
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Edit user</h1>
 
           <p className="mt-1 text-sm text-muted-foreground">
-            Update the information for{" "}
-            {user.firstName} {user.lastName}.
+            Update the information for {user.firstName} {user.lastName}.
           </p>
         </div>
       </div>
 
-      <UserForm
-        key={user.id}
-        user={user}
-        onSubmit={handleUpdateUser}
-        isSubmitting={isUpdating}
-      />
+      <UserForm key={user.id} user={user} onSubmit={handleUpdateUser} isSubmitting={isUpdating} />
     </section>
   );
-}
+};
 
 export default EditUserPage;

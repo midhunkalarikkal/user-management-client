@@ -2,10 +2,7 @@ import type { AuthUser } from "@/types/auth";
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentUser } from "@/services/auth-service";
 
-export const AUTH_USER_QUERY_KEY = [
-  "auth",
-  "user",
-] as const;
+export const AUTH_USER_QUERY_KEY = ["auth", "user"] as const;
 
 const useAuthUser = () => {
   return useQuery<AuthUser>({

@@ -12,13 +12,8 @@ import UsersTableColumns from "@/components/table/columns/UsersTableColumns";
 import DeleteUserConfirmation from "@/components/alerts/DeleteUserConfirmation";
 
 const UsersPage = () => {
-
   const navigate = useNavigate();
-  const {
-    mutate: deleteUser,
-    isPending: isDeleting,
-    deletingUserId,
-  } = useDeleteUser();
+  const { mutate: deleteUser, isPending: isDeleting, deletingUserId } = useDeleteUser();
   const [selectedUser, setSelectedUser] = useState<UsersTableColumn | null>(null);
 
   const handleViewDetails = useCallback(

@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
 import {
@@ -23,7 +22,7 @@ import UserProfile from "@/components/details/ProfileDetails";
 import DetailsSection from "@/components/details/DetailsSection";
 import AddressDetails from "@/components/details/AddressDetails";
 
-const UserDetails = ({ user }: { user: User }) => {
+const UserDetails = ({ user }: { user: Omit<User, "password"> }) => {
   return (
     <div className="space-y-5">
       <UserProfile user={user} />
@@ -52,11 +51,7 @@ const UserDetails = ({ user }: { user: User }) => {
         <DetailItem label="Email" value={user.email} />
         <DetailItem label="Phone" value={user.phone} />
         <DetailItem label="Role" value={user.role} />
-        <DetailItem
-          label="Password"
-          value={user.password}
-          sensitive
-        />
+
         <DetailItem label="IP address" value={user.ip} />
         <DetailItem label="MAC address" value={user.macAddress} />
         <DetailItem label="User agent" value={user.userAgent} />
@@ -70,22 +65,8 @@ const UserDetails = ({ user }: { user: User }) => {
         icon={<UserRound className="size-5" />}
       >
         <DetailItem label="Blood group" value={user.bloodGroup} />
-        <DetailItem
-          label="Height"
-          value={
-            user.height == null
-              ? undefined
-              : `${user.height} cm`
-          }
-        />
-        <DetailItem
-          label="Weight"
-          value={
-            user.weight == null
-              ? undefined
-              : `${user.weight} kg`
-          }
-        />
+        <DetailItem label="Height" value={user.height == null ? undefined : `${user.height} cm`} />
+        <DetailItem label="Weight" value={user.weight == null ? undefined : `${user.weight} kg`} />
         <DetailItem label="Eye color" value={user.eyeColor} />
         <DetailItem label="Hair color" value={user.hair?.color} />
         <DetailItem label="Hair type" value={user.hair?.type} />
@@ -105,10 +86,7 @@ const UserDetails = ({ user }: { user: User }) => {
         icon={<BriefcaseBusiness className="size-5" />}
       >
         <DetailItem label="Company name" value={user.company?.name} />
-        <DetailItem
-          label="Department"
-          value={user.company?.department}
-        />
+        <DetailItem label="Department" value={user.company?.department} />
         <DetailItem label="Job title" value={user.company?.title} />
         <DetailItem label="University" value={user.university} />
       </DetailsSection>
@@ -126,28 +104,11 @@ const UserDetails = ({ user }: { user: User }) => {
         description="Banking and payment account details."
         icon={<CreditCard className="size-5" />}
       >
-        <DetailItem
-          label="Card number"
-          value={user.bank?.cardNumber}
-          sensitive
-        />
-        <DetailItem
-          label="Card expiry"
-          value={user.bank?.cardExpire}
-        />
-        <DetailItem
-          label="Card type"
-          value={user.bank?.cardType}
-        />
-        <DetailItem
-          label="Currency"
-          value={user.bank?.currency}
-        />
-        <DetailItem
-          label="IBAN"
-          value={user.bank?.iban}
-          sensitive
-        />
+        <DetailItem label="Card number" value={user.bank?.cardNumber} sensitive />
+        <DetailItem label="Card expiry" value={user.bank?.cardExpire} />
+        <DetailItem label="Card type" value={user.bank?.cardType} />
+        <DetailItem label="Currency" value={user.bank?.currency} />
+        <DetailItem label="IBAN" value={user.bank?.iban} sensitive />
       </DetailsSection>
 
       <DetailsSection
@@ -156,24 +117,19 @@ const UserDetails = ({ user }: { user: User }) => {
         icon={<Wallet className="size-5" />}
       >
         <DetailItem label="Coin" value={user.crypto?.coin} />
-        <DetailItem
-          label="Wallet address"
-          value={user.crypto?.wallet}
-          sensitive
-        />
+        <DetailItem label="Wallet address" value={user.crypto?.wallet} sensitive />
         <DetailItem label="Network" value={user.crypto?.network} />
       </DetailsSection>
     </div>
   );
-}
+};
 
 const UserDetailsPage = () => {
   const navigate = useNavigate();
   const { userId } = useParams();
 
   const id = Number(userId);
-  const isValidId =
-    Number.isSafeInteger(id) && id > 0;
+  const isValidId = Number.isSafeInteger(id) && id > 0;
 
   const {
     data: user,
@@ -192,9 +148,7 @@ const UserDetailsPage = () => {
       <div className="mx-auto max-w-7xl rounded-xl border p-10 text-center">
         <CircleAlert className="mx-auto mb-3 size-8 text-destructive" />
         <h2 className="font-semibold">Invalid user ID</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The requested user ID is not valid.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">The requested user ID is not valid.</p>
         <Button
           variant="outline"
           className="mt-5 cursor-pointer"
@@ -208,14 +162,9 @@ const UserDetailsPage = () => {
 
   if (isPending) {
     return (
-      <div
-        role="status"
-        className="flex min-h-80 flex-col items-center justify-center gap-3"
-      >
+      <div role="status" className="flex min-h-80 flex-col items-center justify-center gap-3">
         <LoaderCircle className="size-7 animate-spin text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">
-          Loading user details...
-        </p>
+        <p className="text-sm text-muted-foreground">Loading user details...</p>
       </div>
     );
   }
@@ -224,17 +173,11 @@ const UserDetailsPage = () => {
     return (
       <div className="mx-auto max-w-7xl rounded-xl border p-10 text-center">
         <CircleAlert className="mx-auto mb-3 size-8 text-destructive" />
-        <h2 className="font-semibold">
-          Unable to load user details
-        </h2>
+        <h2 className="font-semibold">Unable to load user details</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           {error?.message ?? "The requested user was not found."}
         </p>
-        <Button
-          variant="outline"
-          className="mt-5 cursor-pointer"
-          onClick={() => void refetch()}
-        >
+        <Button variant="outline" className="mt-5 cursor-pointer" onClick={() => void refetch()}>
           Try again
         </Button>
       </div>
@@ -256,19 +199,14 @@ const UserDetailsPage = () => {
           </Button>
 
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              User details
-            </h1>
+            <h1 className="text-2xl font-semibold tracking-tight">User details</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Complete profile and account information for this user.
             </p>
           </div>
         </div>
 
-        <Button
-          className="cursor-pointer"
-          onClick={() => navigate(`/users/${user.id}/edit`)}
-        >
+        <Button className="cursor-pointer" onClick={() => navigate(`/users/${user.id}/edit`)}>
           <Edit3 className="size-4" />
           Edit user
         </Button>
@@ -279,6 +217,6 @@ const UserDetailsPage = () => {
       <UserDetails user={user} />
     </section>
   );
-}
+};
 
 export default UserDetailsPage;

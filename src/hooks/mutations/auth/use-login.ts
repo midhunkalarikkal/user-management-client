@@ -1,40 +1,23 @@
-import {
-    useMutation,
-    useQueryClient,
-} from "@tanstack/react-query";
-import axios from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { login } from "@/services/auth-service";
-import { AUTH_USER_QUERY_KEY } from "./use-auth-user";
+import { resetAuthSession } from "@/lib/server-api";
 
 const useLogin = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationKey: ["login"],
-        mutationFn: login,
+  return useMutation({
+    mutationKey: ["login"],
+    mutationFn: login,
 
-        onSuccess: (data) => {
-            queryClient.setQueryData(
-                AUTH_USER_QUERY_KEY,
-                data.user,
-            );
+    onSuccess: (data) => {
+      resetAuthSession();
 
-            toast.success("Logged in successfully.");
-        },
+      queryClient.setQueryData(["auth", "user"], data.user);
 
-        onError: (error) => {
-            const message = axios.isAxiosError(error)
-                ? error.response?.data?.message
-                : undefined;
-
-            toast.error(
-                typeof message === "string"
-                    ? message
-                    : "Unable to log in. Please try again.",
-            );
-        },
-    });
+      toast.success("Logged in successfully.");
+    },
+  });
 };
 
 export default useLogin;

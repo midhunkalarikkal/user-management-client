@@ -1,12 +1,7 @@
 import type { DetailsSectionProps } from "@/types/components";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 
-const DetailsSection = ({
-  title,
-  description,
-  icon,
-  children,
-}: DetailsSectionProps) => {
+const DetailsSection = ({ title, description, icon, children }: DetailsSectionProps) => {
   return (
     <Card className="gap-0 overflow-hidden py-0 shadow-none">
       <CardHeader className="border-b py-5">
@@ -23,12 +18,10 @@ const DetailsSection = ({
       </CardHeader>
 
       <CardContent className="py-6">
-        <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2 xl:grid-cols-3">
-          {children}
-        </div>
+        <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2 xl:grid-cols-3">{children}</div>
       </CardContent>
     </Card>
   );
-}
+};
 
 export default DetailsSection;

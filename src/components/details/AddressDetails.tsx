@@ -10,16 +10,10 @@ const AddressDetails = ({ address }: { address: Address }) => {
       <DetailItem label="State code" value={address.stateCode} />
       <DetailItem label="Postal code" value={address.postalCode} />
       <DetailItem label="Country" value={address.country} />
-      <DetailItem
-        label="Latitude"
-        value={address.coordinates?.lat}
-      />
-      <DetailItem
-        label="Longitude"
-        value={address.coordinates?.lng}
-      />
+      <DetailItem label="Latitude" value={address.coordinates?.lat} />
+      <DetailItem label="Longitude" value={address.coordinates?.lng} />
     </>
   );
-}
+};
 
 export default AddressDetails;

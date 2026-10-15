@@ -1,8 +1,4 @@
-import type {
-  User,
-  UsersTableColumn,
-  ApiPaginatedResponse,
-} from "@/types/user";
+import type { User, UsersTableColumn, ApiPaginatedResponse } from "@/types/user";
 import { toast } from "react-toastify";
 import { createUser } from "@/services/user.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -16,23 +12,18 @@ const useCreateUser = () => {
     mutationFn: createUser,
 
     onSuccess: async (createdUser) => {
-
       // Prevent ongoing requests from overwriting cached data.
       await queryClient.cancelQueries({
         queryKey: ["users"],
       });
 
       // Updates existing cached users table queries.
-      queryClient.setQueriesData<
-        ApiPaginatedResponse<UsersTableColumn>
-      >(
+      queryClient.setQueriesData<ApiPaginatedResponse<UsersTableColumn>>(
         { queryKey: ["users"] },
         (oldData) => {
           if (!oldData) return oldData;
 
-          const alreadyExists = oldData.users.some(
-            (user) => user.id === createdUser.id,
-          );
+          const alreadyExists = oldData.users.some((user) => user.id === createdUser.id);
 
           if (alreadyExists) return oldData;
 
@@ -49,10 +40,7 @@ const useCreateUser = () => {
           // Only insert the new user into the first page.
           const updatedUsers =
             oldData.skip === 0
-              ? [newUser, ...oldData.users].slice(
-                  0,
-                  oldData.limit,
-                )
+              ? [newUser, ...oldData.users].slice(0, oldData.limit)
               : oldData.users;
 
           return {
@@ -64,18 +52,9 @@ const useCreateUser = () => {
       );
 
       // Cache the newly created user's details.
-      queryClient.setQueryData<User>(
-        ["user", createdUser.id],
-        createdUser,
-      );
+      queryClient.setQueryData<User>(["user", createdUser.id], createdUser);
 
       toast.success("User created successfully.");
-    },
-
-    onError: (error) => {
-      toast.error(
-        error.message || "Unable to create the user.",
-      );
     },
   });
 };

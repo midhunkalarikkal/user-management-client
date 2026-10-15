@@ -77,29 +77,32 @@ const DataTable = <TData extends RowData>({
   }
 
   React.useEffect(() => {
-    if (!searchKey || searchInput === searchValueParam) {
+    if (searchInput === searchValueParam) {
       return;
     }
 
     const timeout = window.setTimeout(() => {
-      setSearchParams((previous) => {
-        const params = new URLSearchParams(previous);
-        const value = searchInput.trim();
+      setSearchParams(
+        (previous) => {
+          const params = new URLSearchParams(previous);
+          const value = searchInput.trim();
 
-        if (value) {
-          params.set("searchValue", value);
-        } else {
-          params.delete("searchValue");
-        }
+          if (value) {
+            params.set("searchValue", value);
+          } else {
+            params.delete("searchValue");
+          }
 
-        params.delete("page");
+          params.delete("page");
 
-        return params;
-      });
+          return params;
+        },
+        { replace: true },
+      );
     }, 1000);
 
     return () => window.clearTimeout(timeout);
-  }, [searchInput, searchValueParam, searchKey, setSearchParams]);
+  }, [searchInput, searchValueParam, setSearchParams]);
 
   const sortBy: UserSortField | undefined = isValidValue(sortByParam, sortByValues)
     ? sortByParam
@@ -115,7 +118,7 @@ const DataTable = <TData extends RowData>({
     sortBy,
     order,
     searchKey,
-    searchValue: searchKey ? searchValueParam : undefined,
+    searchValue: searchValueParam.trim() || undefined,
   };
 
   const { data, error, isError, isPending, isFetching, refetch } = useQuery({
@@ -126,7 +129,7 @@ const DataTable = <TData extends RowData>({
       sortBy ?? null,
       order ?? null,
       searchKey ?? null,
-      searchKey ? searchValueParam : null,
+      searchValueParam.trim(),
     ],
     queryFn: ({ signal }) => queryFunction(queryParams, signal),
   });
@@ -286,7 +289,7 @@ const DataTable = <TData extends RowData>({
           <div className="flex flex-wrap items-center gap-2">
             <Select value={searchKey ?? ""} onValueChange={handleSearchFieldChange}>
               <SelectTrigger className="w-44">
-                <SelectValue placeholder="Search field" />
+                <SelectValue placeholder="Filter fields" />
               </SelectTrigger>
 
               <SelectContent>
@@ -304,7 +307,6 @@ const DataTable = <TData extends RowData>({
               <Input
                 value={searchInput}
                 onChange={(event) => setSearchInput(event.target.value)}
-                disabled={!searchKey}
                 placeholder={searchKey ? "Enter search value..." : "Select a field first"}
                 aria-label="Search value"
                 className="w-56 pl-9"

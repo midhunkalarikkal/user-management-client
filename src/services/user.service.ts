@@ -18,24 +18,26 @@ export async function getUsers(
   const { page, limit, sortBy, order, searchKey, searchValue } = queryParams;
 
   const skip = (page - 1) * limit;
+  const search = searchValue?.trim();
+
+  const normalizedSearch =
+    searchKey === "role" || searchKey === "gender" ? search?.toLowerCase() : search;
+
+  const endpoint = search ? (searchKey ? "/users/filter" : "/users/search") : "/users";
 
   const params = {
     limit,
     skip,
     ...(sortBy && { sortBy, order: order ?? "asc" }),
-    ...(searchKey &&
-      searchValue?.trim() && {
-        key: searchKey,
-        value: searchValue.trim(),
-      }),
+    ...(search &&
+      (searchKey ? { key: searchKey, value: normalizedSearch } : { q: normalizedSearch })),
   };
-
-  const endpoint = searchKey && searchValue?.trim() ? "/users/filter" : "/users";
 
   const { data } = await serverApi.get<ApiPaginatedResponse<UsersTableColumn>>(endpoint, {
     params,
     signal,
   });
+
   return data;
 }
 

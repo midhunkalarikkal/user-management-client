@@ -101,3 +101,11 @@ export interface DeleteUserConfirmationProps {
   onConfirm: () => void;
   onCancel: () => void;
 }
+
+// Error alert interface
+export interface ErrorAlertProps {
+  heading: string;
+  errorMessage: string;
+  error: Error | null;
+  refetch: () => void;
+}

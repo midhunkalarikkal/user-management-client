@@ -371,7 +371,7 @@ const DataTable = <TData extends RowData>({
                   <div className="space-y-3">
                     <p className="font-medium">Failed to load records</p>
 
-                    <p className="text-sm text-muted-foreground">{error.message}</p>
+                    <p className="text-sm text-muted-foreground">"{error.message}</p>
 
                     <Button variant="outline" onClick={() => void refetch()}>
                       Try again

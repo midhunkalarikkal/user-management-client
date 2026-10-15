@@ -4,11 +4,9 @@ import {
   ArrowLeft,
   BriefcaseBusiness,
   Building2,
-  CircleAlert,
   CreditCard,
   Edit3,
   Home,
-  LoaderCircle,
   ShieldCheck,
   UserRound,
   Wallet,
@@ -21,6 +19,8 @@ import DetailItem from "@/components/details/data-item";
 import UserProfile from "@/components/details/ProfileDetails";
 import DetailsSection from "@/components/details/DetailsSection";
 import AddressDetails from "@/components/details/AddressDetails";
+import LoadingPage from "@/components/layout/LoadingPage";
+import ErrorAlert from "@/components/alerts/ErrorAlert";
 
 const UserDetails = ({ user }: { user: Omit<User, "password"> }) => {
   return (
@@ -145,42 +145,27 @@ const UserDetailsPage = () => {
 
   if (!isValidId) {
     return (
-      <div className="mx-auto max-w-7xl rounded-xl border p-10 text-center">
-        <CircleAlert className="mx-auto mb-3 size-8 text-destructive" />
-        <h2 className="font-semibold">Invalid user ID</h2>
-        <p className="mt-2 text-sm text-muted-foreground">The requested user ID is not valid.</p>
-        <Button
-          variant="outline"
-          className="mt-5 cursor-pointer"
-          onClick={() => navigate("/users")}
-        >
-          Back to users
-        </Button>
-      </div>
+      <ErrorAlert
+        heading="Invalid user ID"
+        errorMessage="The requested user ID is not valid."
+        error={error}
+        refetch={refetch}
+      />
     );
   }
 
   if (isPending) {
-    return (
-      <div role="status" className="flex min-h-80 flex-col items-center justify-center gap-3">
-        <LoaderCircle className="size-7 animate-spin text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">Loading user details...</p>
-      </div>
-    );
+    return <LoadingPage />;
   }
 
-  if (isError || !user) {
+  if (!isError || !user) {
     return (
-      <div className="mx-auto max-w-7xl rounded-xl border p-10 text-center">
-        <CircleAlert className="mx-auto mb-3 size-8 text-destructive" />
-        <h2 className="font-semibold">Unable to load user details</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {error?.message ?? "The requested user was not found."}
-        </p>
-        <Button variant="outline" className="mt-5 cursor-pointer" onClick={() => void refetch()}>
-          Try again
-        </Button>
-      </div>
+      <ErrorAlert
+        heading="Failed to load user details"
+        errorMessage="Something went wrong"
+        error={error}
+        refetch={refetch}
+      />
     );
   }
 

@@ -57,19 +57,14 @@ export const deleteUser = async (userId: User["id"]): Promise<DeleteUserResponse
 
 // Creates a user with all entered details.
 export const createUser = async (values: UserFormValues): Promise<User> => {
-  const { data } = await serverApi.post<User>("/users/add", values);
+  const { data } = await serverApi.post<User>("/users/", values);
 
   return data;
 };
 
 // Updates a users details.
 export const updateUser = async ({ userId, values }: UpdateUserParams): Promise<User> => {
-  const { password, ...remainingValues } = values;
-
-  // if the password is empty, the user is keeping their current password.
-  const payload = password.trim() ? { ...remainingValues, password } : remainingValues;
-
-  const { data } = await serverApi.patch<User>(`/users/${userId}`, payload);
+  const { data } = await serverApi.put<User>(`/users/${userId}`, values);
 
   return data;
 };

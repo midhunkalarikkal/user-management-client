@@ -1,13 +1,13 @@
-import { useTheme } from "next-themes";
 import AppRouter from "./routes/AppRouter";
 import { ToastContainer } from "react-toastify";
 import ThemeProvider from "./components/theme/ThemeProvider";
+import { useTheme } from "next-themes";
 
-function App() {
+function AppContent() {
   const { resolvedTheme } = useTheme();
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <>
       <AppRouter />
       <ToastContainer
         position="top-right"
@@ -17,6 +17,14 @@ function App() {
         pauseOnHover
         theme={resolvedTheme === "dark" ? "dark" : "light"}
       />
+    </>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <AppContent />
     </ThemeProvider>
   );
 }

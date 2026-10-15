@@ -1,11 +1,11 @@
 import { Plus } from "lucide-react";
 import { toast } from "react-toastify";
+import { useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router";
 import { getUsers } from "@/services/user.service";
 import type { UsersTableColumn } from "@/types/user";
 import DataTable from "@/components/table/DataTable";
-import { useCallback, useMemo, useState } from "react";
 import useDeleteUser from "@/hooks/mutations/users/use-delete-user";
 import { USERS_SEARCH_FIELDS, USERS_SORT_BY } from "@/utils/constant";
 import UsersTableColumns from "@/components/table/columns/UsersTableColumns";
@@ -14,7 +14,6 @@ import DeleteUserConfirmation from "@/components/alerts/DeleteUserConfirmation";
 const UsersPage = () => {
   const navigate = useNavigate();
   const { mutate: deleteUser, isPending: isDeleting, deletingUserId } = useDeleteUser();
-  const [selectedUser, setSelectedUser] = useState<UsersTableColumn | null>(null);
 
   const handleViewDetails = useCallback(
     (userId: number) => {
@@ -87,24 +86,6 @@ const UsersPage = () => {
         getRowId={(row) => String(row.id)}
         emptyMessage="No users found"
       />
-
-      {selectedUser && (
-        <div role="status" className="rounded-lg border p-4 text-sm">
-          Selected for deletion:{" "}
-          <strong>
-            {selectedUser.firstName} {selectedUser.lastName}
-          </strong>
-          . Deletion is not yet implemented.
-          <Button
-            variant="outline"
-            size="sm"
-            className="ml-3"
-            onClick={() => setSelectedUser(null)}
-          >
-            Dismiss
-          </Button>
-        </div>
-      )}
     </section>
   );
 };

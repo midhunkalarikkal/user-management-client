@@ -1,6 +1,6 @@
+// import type { FieldPath } from "react-hook-form";
+// import type { UserFormValues } from "@/schemas/user.schema";
 import type { SortOrder, UserSortField } from "@/types/user";
-import type { FieldPath } from "react-hook-form";
-import type { UserFormValues } from "@/schemas/user.schema";
 import { UserPlus, UsersRound, type LucideIcon } from "lucide-react";
 
 // Sidebar navigation options
@@ -90,15 +90,15 @@ export const USERS_SEARCH_FIELDS = [
 ] as const;
 
 // required user form fields
-export const REQUIRED_FIELDS = new Set<FieldPath<UserFormValues>>([
-  "image",
-  "firstName",
-  "lastName",
-  "email",
-  "age",
-  "username",
-  "gender",
-  "role",
-]);
+// export const REQUIRED_FIELDS = new Set<FieldPath<UserFormValues>>([
+//   "image",
+//   "firstName",
+//   "lastName",
+//   "email",
+//   "age",
+//   "username",
+//   "gender",
+//   "role",
+// ]);
 
-export const CREATE_ONLY_REQUIRED_FIELDS = new Set<FieldPath<UserFormValues>>(["password"]);
+// export const CREATE_ONLY_REQUIRED_FIELDS = new Set<FieldPath<UserFormValues>>(["password"]);

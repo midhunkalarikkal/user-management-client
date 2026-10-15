@@ -1,9 +1,11 @@
 import { ArrowLeft } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { useNavigate, useParams } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 import UserForm from "@/components/users/UserForm";
+import { useNavigate, useParams } from "react-router";
 import { getUserById } from "@/services/user.service";
+import ErrorAlert from "@/components/alerts/ErrorAlert";
+import LoadingPage from "@/components/layout/LoadingPage";
 import type { UserFormValues } from "@/schemas/user.schema";
 import useUpdateUser from "@/hooks/mutations/users/use-update-user";
 
@@ -45,28 +47,28 @@ const EditUserPage = () => {
   };
 
   if (!isValidId) {
-    return <p className="text-sm text-destructive">Invalid user ID.</p>;
+    return (
+      <ErrorAlert
+        heading="Unable to load user details."
+        errorMessage="Invalid user id"
+        error={error}
+        refetch={refetch}
+      />
+    );
   }
 
   if (isPending) {
-    return (
-      <div className="flex min-h-64 items-center justify-center text-sm text-muted-foreground">
-        Loading user details...
-      </div>
-    );
+    return <LoadingPage />;
   }
 
   if (isError || !user) {
     return (
-      <div className="space-y-3 text-center">
-        <p className="font-medium">Unable to load user details.</p>
-
-        <p className="text-sm text-muted-foreground">{error?.message}</p>
-
-        <Button variant="outline" onClick={() => void refetch()}>
-          Try again
-        </Button>
-      </div>
+      <ErrorAlert
+        heading="Unable to load user details."
+        errorMessage="Something went wrong"
+        error={error}
+        refetch={refetch}
+      />
     );
   }
 

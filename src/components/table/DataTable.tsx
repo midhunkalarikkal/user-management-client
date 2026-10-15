@@ -59,6 +59,7 @@ const DataTable = <TData extends RowData>({
   const searchValueParam = searchParams.get("searchValue") ?? "";
 
   const [searchInput, setSearchInput] = React.useState(searchValueParam);
+  const [previousSearchValue, setPreviousSearchValue] = React.useState(searchValueParam);
 
   const sortByValues = sortByConstants.map((item) => item.value);
 
@@ -70,9 +71,10 @@ const DataTable = <TData extends RowData>({
     ? searchKeyParam
     : undefined;
 
-  React.useEffect(() => {
+  if (searchValueParam !== previousSearchValue) {
+    setPreviousSearchValue(searchValueParam);
     setSearchInput(searchValueParam);
-  }, [searchValueParam]);
+  }
 
   React.useEffect(() => {
     if (!searchKey || searchInput === searchValueParam) {

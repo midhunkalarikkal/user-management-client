@@ -1,17 +1,6 @@
-
 import { createColumnHelper } from "@tanstack/react-table";
-import {
-  Eye,
-  Pencil,
-  Trash2,
-  MoreHorizontal,
-  LoaderCircle,
-} from "lucide-react";
-
-import type { UsersTableColumn } from "@/types/user";
-import type { DataTableFeatures } from "../data-table-features";
-
-import { Button } from "@/components/ui/button";
+import { Eye, Pencil, Trash2, MoreHorizontal, LoaderCircle } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -21,11 +10,11 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import type { UsersTableColumn } from "@/types/user";
+import type { DataTableFeatures } from "../DataTableFeatures";
 
-const columnHelper = createColumnHelper<
-  DataTableFeatures,
-  UsersTableColumn
->();
+const columnHelper = createColumnHelper<DataTableFeatures, UsersTableColumn>();
 
 // User columns with action handlers and loading states.
 const UsersTableColumns = (
@@ -33,9 +22,29 @@ const UsersTableColumns = (
   onEditUser: (userId: number) => void,
   onDeleteUser: (user: UsersTableColumn) => void,
   deletingUserId: number | null = null,
-  editingUserId: number | null = null,
 ) =>
   columnHelper.columns([
+    columnHelper.accessor("image", {
+      header: "Profile",
+      enableHiding: false,
+      cell: ({ row }) => {
+        const user = row.original;
+
+        const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+
+        return (
+          <Avatar className="size-10 border bg-muted">
+            <AvatarImage
+              src={user.image || undefined}
+              alt={`${user.firstName} ${user.lastName}`}
+              className="object-cover"
+            />
+            <AvatarFallback className="text-xs font-medium">{initials}</AvatarFallback>
+          </Avatar>
+        );
+      },
+    }),
+
     columnHelper.accessor("firstName", {
       header: "First Name",
       cell: ({ row }) => (
@@ -48,9 +57,7 @@ const UsersTableColumns = (
     columnHelper.accessor("email", {
       header: "Email",
       cell: ({ row }) => (
-        <span className="text-sm text-muted-foreground">
-          {row.original.email}
-        </span>
+        <span className="text-sm text-muted-foreground">{row.original.email}</span>
       ),
     }),
 
@@ -60,11 +67,7 @@ const UsersTableColumns = (
 
     columnHelper.accessor("role", {
       header: "Role",
-      cell: ({ row }) => (
-        <span className="capitalize">
-          {row.original.role}
-        </span>
-      ),
+      cell: ({ row }) => <span className="capitalize">{row.original.role}</span>,
     }),
 
     columnHelper.display({
@@ -76,35 +79,24 @@ const UsersTableColumns = (
         const user = row.original;
 
         const isDeleting = deletingUserId === user.id;
-        const isEditing = editingUserId === user.id;
-        const isUpdating = isDeleting || isEditing;
+        const isUpdating = isDeleting;
 
         if (isUpdating) {
           return (
-            <div
-              role="status"
-              aria-live="polite"
-              className="flex min-w-36 items-center gap-2"
-            >
+            <div role="status" aria-live="polite" className="flex min-w-36 items-center gap-2">
               <LoaderCircle
                 aria-hidden="true"
                 className={`size-4 shrink-0 animate-spin ${
-                  isDeleting
-                    ? "text-destructive"
-                    : "text-primary"
+                  isDeleting ? "text-destructive" : "text-primary"
                 }`}
               />
 
               <span
                 className={`text-xs font-medium whitespace-nowrap ${
-                  isDeleting
-                    ? "text-destructive"
-                    : "text-muted-foreground"
+                  isDeleting ? "text-destructive" : "text-muted-foreground"
                 }`}
               >
-                {isDeleting
-                  ? "Deleting user..."
-                  : "Updating user..."}
+                {isDeleting ? "Deleting user..." : "Updating user..."}
               </span>
             </div>
           );
@@ -127,22 +119,14 @@ const UsersTableColumns = (
 
             <DropdownMenuContent align="end">
               <DropdownMenuGroup>
-                <DropdownMenuLabel>
-                  User actions
-                </DropdownMenuLabel>
+                <DropdownMenuLabel>User actions</DropdownMenuLabel>
 
-                <DropdownMenuItem
-                  onClick={() => onViewDetails(user.id)}
-                  className="cursor-pointer"
-                >
+                <DropdownMenuItem onClick={() => onViewDetails(user.id)} className="cursor-pointer">
                   <Eye className="size-4" />
                   View details
                 </DropdownMenuItem>
 
-                <DropdownMenuItem
-                  onClick={() => onEditUser(user.id)}
-                  className="cursor-pointer"
-                >
+                <DropdownMenuItem onClick={() => onEditUser(user.id)} className="cursor-pointer">
                   <Pencil className="size-4" />
                   Edit user
                 </DropdownMenuItem>

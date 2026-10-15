@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useSearchParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-
 import {
   useTable,
   flexRender,
@@ -9,7 +8,6 @@ import {
   type ColumnVisibilityState,
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-
 import {
   Table,
   TableBody,
@@ -18,7 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import {
   Select,
   SelectContent,
@@ -26,39 +23,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import { features } from "./data-table-features";
-import { SORT_ORDERS } from "@/utils/constant";
-
-import type { SortOrder, UserSortField, GetUsersQueryParams } from "@/types/user";
-import { isValidValue } from "@/utils/helper/isValidValue";
-import type { DataTableProps } from "@/types/components";
-
-import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { SORT_ORDERS } from "@/utils/constant";
+import { features } from "./DataTableFeatures";
+import type { UserSearchField } from "@/types/common";
+import type { DataTableProps } from "@/types/components";
+import { isValidValue } from "@/utils/helper/isValidValue";
+import { getPositiveInteger } from "@/utils/helper/etPositiveInteger";
+import type { SortOrder, UserSortField, GetUsersQueryParams } from "@/types/user";
 
-import type { UserSearchField } from "@/utils/constant";
-
-// Reads a positive integer from URL parameters.
-function getPositiveInteger(value: string | null, fallback: number): number {
-  if (!value || !/^\d+$/.test(value)) {
-    return fallback;
-  }
-
-  const parsed = Number(value);
-
-  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback;
-}
-
-// Renders a reusable API-driven table.
-export default function DataTable<TData extends RowData>({
+const DataTable = <TData extends RowData>({
   columns,
   queryFunction,
   queryKey,
@@ -66,20 +47,19 @@ export default function DataTable<TData extends RowData>({
   searchByConstants = [],
   emptyMessage = "No records found.",
   getRowId,
-}: DataTableProps<TData>) {
+}: DataTableProps<TData>) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Reads pagination from the URL.
   const page = getPositiveInteger(searchParams.get("page"), 1);
   const limit = Math.min(getPositiveInteger(searchParams.get("limit"), 10), 100);
 
-  // Validates sorting parameters.
   const sortByParam = searchParams.get("sortBy");
   const orderParam = searchParams.get("order");
   const searchKeyParam = searchParams.get("searchKey");
   const searchValueParam = searchParams.get("searchValue") ?? "";
 
   const [searchInput, setSearchInput] = React.useState(searchValueParam);
+  const [previousSearchValue, setPreviousSearchValue] = React.useState(searchValueParam);
 
   const sortByValues = sortByConstants.map((item) => item.value);
 
@@ -91,9 +71,10 @@ export default function DataTable<TData extends RowData>({
     ? searchKeyParam
     : undefined;
 
-  React.useEffect(() => {
+  if (searchValueParam !== previousSearchValue) {
+    setPreviousSearchValue(searchValueParam);
     setSearchInput(searchValueParam);
-  }, [searchValueParam]);
+  }
 
   React.useEffect(() => {
     if (!searchKey || searchInput === searchValueParam) {
@@ -128,16 +109,15 @@ export default function DataTable<TData extends RowData>({
     ? orderParam
     : undefined;
 
-  // Creates the query parameters for the API.
   const queryParams: GetUsersQueryParams = {
     page,
     limit,
     sortBy,
     order,
+    searchKey,
     searchValue: searchKey ? searchValueParam : undefined,
   };
 
-  // Fetches records inside the reusable table.
   const { data, error, isError, isPending, isFetching, refetch } = useQuery({
     queryKey: [
       queryKey,
@@ -151,7 +131,6 @@ export default function DataTable<TData extends RowData>({
     queryFn: ({ signal }) => queryFunction(queryParams, signal),
   });
 
-  // Updates the search field and resets the current search.
   function handleSearchFieldChange(value: string | null) {
     setSearchInput("");
 
@@ -171,7 +150,6 @@ export default function DataTable<TData extends RowData>({
     });
   }
 
-  // Removes the selected search field and value.
   function clearSearch() {
     setSearchInput("");
 
@@ -186,10 +164,8 @@ export default function DataTable<TData extends RowData>({
     });
   }
 
-  // Manages column visibility locally.
   const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibilityState>({});
 
-  // Always supplies an array to TanStack Table.
   const tableData = React.useMemo(() => data?.users ?? [], [data]);
 
   const table = useTable({
@@ -264,10 +240,9 @@ export default function DataTable<TData extends RowData>({
     });
   }
 
-  const start = total === 0 ? 0 : (page - 1) * limit + 1;
-
-  const end = Math.min(page * limit, total);
-
+  const currentPageCount = data?.users.length ?? 0;
+  const start = currentPageCount === 0 ? 0 : (page - 1) * limit + 1;
+  const end = currentPageCount === 0 ? 0 : start + currentPageCount - 1;
   const columnCount = Math.max(table.getVisibleLeafColumns().length, 1);
 
   return (
@@ -337,7 +312,7 @@ export default function DataTable<TData extends RowData>({
             </div>
 
             {(searchKey || searchValueParam) && (
-              <Button variant="outline" size="sm" onClick={clearSearch}>
+              <Button variant="outline" className="cursor-pointer" onClick={clearSearch}>
                 Clear search
               </Button>
             )}
@@ -457,4 +432,6 @@ export default function DataTable<TData extends RowData>({
       </div>
     </div>
   );
-}
+};
+
+export default DataTable;

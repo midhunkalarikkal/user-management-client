@@ -1,20 +1,10 @@
 import { Outlet } from "react-router";
+import AppHeader from "@/components/layout/AppHeader";
+import AppSidebar from "@/components/layout/AppSidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import AppHeader from "@/components/layout/app-header";
-import AppSidebar from "@/components/layout/app-sidebar";
-import { ToastContainer } from "react-toastify";
 
-export default function AppLayout() {
+const AppLayout = () => {
   return (
-    <>
-    <ToastContainer
-  position="top-right"
-  autoClose={4000}
-  newestOnTop
-  closeOnClick={false}
-  pauseOnHover
-  theme="colored"
-/>
     <SidebarProvider defaultOpen>
       <AppSidebar />
 
@@ -26,6 +16,7 @@ export default function AppLayout() {
         </main>
       </SidebarInset>
     </SidebarProvider>
-  </>
   );
-}
+};
+
+export default AppLayout;

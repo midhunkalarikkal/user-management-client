@@ -1,9 +1,9 @@
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+const serverUrl = import.meta.env.VITE_SERVER_URL;
 
-if (!apiBaseUrl) {
+if (!serverUrl) {
   throw new Error("Missing VITE_API_BASE_URL environment variable");
 }
 
 export const env = {
-  apiBaseUrl: apiBaseUrl.replace(/\/+$/, ""),
+  serverUrl: serverUrl.replace(/\/+$/, ""),
 } as const;

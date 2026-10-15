@@ -1,8 +1,4 @@
-import { type Column, type RowData } from "@tanstack/react-table";
 import { cn } from "cn";
-import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,22 +6,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { type RowData } from "@tanstack/react-table";
+import type { DataTableColumnHeaderProps } from "@/types/components";
+import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from "lucide-react";
 
-import { type DataTableFeatures } from "./data-table-features";
-
-interface DataTableColumnHeaderProps<
-  TData extends RowData,
-  TValue,
-> extends React.HTMLAttributes<HTMLDivElement> {
-  column: Column<DataTableFeatures, TData, TValue>;
-  title: string;
-}
-
-export function DataTableColumnHeader<TData extends RowData, TValue>({
+const DataTableColumnHeader = <TData extends RowData, TValue>({
   column,
   title,
   className,
-}: DataTableColumnHeaderProps<TData, TValue>) {
+}: DataTableColumnHeaderProps<TData, TValue>) => {
   if (!column.getCanSort()) {
     return <div className={cn(className)}>{title}</div>;
   }
@@ -63,4 +53,6 @@ export function DataTableColumnHeader<TData extends RowData, TValue>({
       </DropdownMenu>
     </div>
   );
-}
+};
+
+export default DataTableColumnHeader;

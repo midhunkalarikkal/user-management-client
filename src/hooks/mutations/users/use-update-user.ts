@@ -1,7 +1,8 @@
-import type { User, UsersTableColumn, ApiPaginatedResponse } from "@/types/user";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { TEST_USER_TAG } from "@/utils/constant";
 import { updateUser } from "@/services/user.service";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { User, UsersTableColumn, ApiPaginatedResponse, UpdateUserParams } from "@/types/user";
 
 // User updates and synchronizes cached data.
 const useUpdateUser = () => {
@@ -9,7 +10,15 @@ const useUpdateUser = () => {
 
   return useMutation({
     mutationKey: ["update-user"],
-    mutationFn: updateUser,
+    mutationFn: async ({ userId, values }: UpdateUserParams) => {
+      const cachedUser = queryClient.getQueryData<User>(["user", userId]);
+
+      if (cachedUser?.tag === TEST_USER_TAG || values.tag === TEST_USER_TAG) {
+        return null;
+      }
+
+      return updateUser({ userId, values });
+    },
 
     onSuccess: async (updatedUser, variables) => {
       const { userId, values } = variables;
@@ -59,7 +68,7 @@ const useUpdateUser = () => {
         return {
           ...oldUser,
           ...safeValues,
-          id: updatedUser.id,
+          id: updatedUser?.id ?? userId,
         };
       });
 

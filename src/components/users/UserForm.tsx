@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { USER_FORM_SECTIONS } from "./user-form-fields";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -23,7 +22,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { UserFormField, UserFormProps } from "@/types/components";
-import { CREATE_ONLY_REQUIRED_FIELDS, REQUIRED_FIELDS } from "@/utils/constant";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+// import { CREATE_ONLY_REQUIRED_FIELDS, REQUIRED_FIELDS } from "@/utils/constant";
 
 // reusing form for creating and updating users.
 const UserForm = ({ user, isSubmitting = false, onSubmit }: UserFormProps) => {
@@ -58,8 +58,8 @@ const UserForm = ({ user, isSubmitting = false, onSubmit }: UserFormProps) => {
     const isNumber = type === "number";
     const isPassword = name === "password";
 
-    const isRequired =
-      REQUIRED_FIELDS.has(name) || (!isEditing && CREATE_ONLY_REQUIRED_FIELDS.has(name));
+    // const isRequired = REQUIRED_FIELDS.has(name) || (!isEditing && CREATE_ONLY_REQUIRED_FIELDS.has(name));
+    const isRequired = true;
 
     return (
       <Controller

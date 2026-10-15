@@ -124,7 +124,10 @@ export const userFormSchema = z.object({
       "Username can only contain letters, numbers, dots, underscores and hyphens",
     ),
 
-  password: z.string().max(128, "Password must not exceed 128 characters"),
+  password: z
+    .string()
+    .min(6, "Password must contain at least 6 characters")
+    .max(128, "Password must not exceed 128 characters"),
 
   birthDate: z
     .string()
@@ -176,22 +179,9 @@ export const userFormSchema = z.object({
   role: z.enum(["admin", "moderator", "user"]),
 });
 
-export const createUserSchema = userFormSchema.extend({
-  password: z
-    .string()
-    .min(6, "Password must contain at least 6 characters")
-    .max(128, "Password must not exceed 128 characters"),
-});
+export const createUserSchema = userFormSchema;
 
-export const updateUserSchema = userFormSchema.extend({
-  password: z
-    .string()
-    .max(128, "Password must not exceed 128 characters")
-    .refine(
-      (value) => value === "" || value.length >= 6,
-      "Password must contain at least 6 characters",
-    ),
-});
+export const updateUserSchema = userFormSchema;
 
 export type UserFormValues = z.infer<typeof userFormSchema>;
 

@@ -46,15 +46,51 @@ const optionalCardExpiry = optionalText(5).refine((value) => {
   return Boolean(match);
 }, "Enter a valid expiry date in MM/YY format");
 
+const optionalCompanyText = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max, `Must not exceed ${max} characters`)
+    .regex(
+      /^[\p{L}\p{M}\p{N} &'.,()/-]*$/u,
+      "Only letters, numbers, spaces and common punctuation are allowed",
+    );
+
+const optionalCoinName = z
+  .string()
+  .trim()
+  .max(50, "Coin name must not exceed 50 characters")
+  .regex(/^[\p{L}\p{M}\p{N} .+_-]*$/u, "Invalid cryptocurrency name");
+
+const optionalWalletAddress = z
+  .string()
+  .trim()
+  .max(150, "Wallet address must not exceed 150 characters")
+  .regex(/^[a-zA-Z0-9]*$/, "Wallet address must contain only letters and numbers");
+
+const optionalCryptoNetwork = z
+  .string()
+  .trim()
+  .max(100, "Network must not exceed 100 characters")
+  .regex(/^[\p{L}\p{M}\p{N} .()+_-]*$/u, "Invalid cryptocurrency network");
+
 const addressSchema = z.object({
   address: optionalText(200),
-  city: optionalText(100),
-  state: optionalText(100),
+  city: optionalText(200),
+  state: z
+    .string()
+    .trim()
+    .max(100, "City must not exceed 100 characters")
+    .regex(/^[a-zA-Z\s]*$/, "City must contain only letters and spaces"),
   stateCode: optionalText(20),
 
   postalCode: optionalPattern(20, /^[\p{L}\p{N}\s-]+$/u, "Enter a valid postal code"),
 
-  country: optionalText(100),
+  country: z
+    .string()
+    .trim()
+    .max(100, "Country must not exceed 100 characters")
+    .regex(/^[a-zA-Z\s]*$/, "Country must contain only letters and spaces"),
 
   coordinates: z.object({
     lat: latitude,
@@ -80,16 +116,16 @@ const bankSchema = z.object({
 });
 
 const companySchema = z.object({
-  department: optionalText(100),
-  name: optionalText(150),
-  title: optionalText(100),
+  department: optionalCompanyText(100),
+  name: optionalCompanyText(150),
+  title: optionalCompanyText(100),
   address: addressSchema,
 });
 
 const cryptoSchema = z.object({
-  coin: optionalText(50),
-  wallet: optionalText(150),
-  network: optionalText(100),
+  coin: optionalCoinName,
+  wallet: optionalWalletAddress,
+  network: optionalCryptoNetwork,
 });
 
 export const userFormSchema = z.object({
@@ -177,11 +213,21 @@ export const userFormSchema = z.object({
   crypto: cryptoSchema,
 
   role: z.enum(["admin", "moderator", "user"]),
+
+  tag: z.string().optional(),
 });
 
 export const createUserSchema = userFormSchema;
 
-export const updateUserSchema = userFormSchema;
+export const updateUserSchema = userFormSchema.safeExtend({
+  password: z
+    .string()
+    .max(128, "Password must not exceed 128 characters")
+    .refine(
+      (value) => value === "" || value.length >= 6,
+      "Password must contain at least 6 characters",
+    ),
+});
 
 export type UserFormValues = z.infer<typeof userFormSchema>;
 

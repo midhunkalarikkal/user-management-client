@@ -74,7 +74,7 @@ const EditUserPage = () => {
 
   return (
     <section className="space-y-6">
-      <div className="mx-auto max-w-7xl space-y-3">
+      <div className="mx-auto max-w-full space-y-3">
         <Button
           variant="ghost"
           size="sm"

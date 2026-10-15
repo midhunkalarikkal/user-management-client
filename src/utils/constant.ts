@@ -3,6 +3,8 @@
 import type { SortOrder, UserSortField } from "@/types/user";
 import { UserPlus, UsersRound, type LucideIcon } from "lucide-react";
 
+export const TEST_USER_TAG = "test-user";
+
 // Sidebar navigation options
 export const navigationItems: {
   title: string;

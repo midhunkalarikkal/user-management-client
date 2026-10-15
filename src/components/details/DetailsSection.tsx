@@ -18,7 +18,7 @@ const DetailsSection = ({ title, description, icon, children }: DetailsSectionPr
       </CardHeader>
 
       <CardContent className="py-6">
-        <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2 xl:grid-cols-3">{children}</div>
+        <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2 xl:grid-cols-2">{children}</div>
       </CardContent>
     </Card>
   );

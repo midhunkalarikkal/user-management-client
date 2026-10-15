@@ -16,11 +16,11 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getUserById } from "@/services/user.service";
 import DetailItem from "@/components/details/data-item";
+import ErrorAlert from "@/components/alerts/ErrorAlert";
+import LoadingPage from "@/components/layout/LoadingPage";
 import UserProfile from "@/components/details/ProfileDetails";
 import DetailsSection from "@/components/details/DetailsSection";
 import AddressDetails from "@/components/details/AddressDetails";
-import LoadingPage from "@/components/layout/LoadingPage";
-import ErrorAlert from "@/components/alerts/ErrorAlert";
 
 const UserDetails = ({ user }: { user: Omit<User, "password"> }) => {
   return (
@@ -55,8 +55,8 @@ const UserDetails = ({ user }: { user: Omit<User, "password"> }) => {
         <DetailItem label="IP address" value={user.ip} />
         <DetailItem label="MAC address" value={user.macAddress} />
         <DetailItem label="User agent" value={user.userAgent} />
-        <DetailItem label="EIN" value={user.ein} sensitive />
-        <DetailItem label="SSN" value={user.ssn} sensitive />
+        <DetailItem label="EIN" value={user.ein} />
+        <DetailItem label="SSN" value={user.ssn} />
       </DetailsSection>
 
       <DetailsSection
@@ -104,11 +104,11 @@ const UserDetails = ({ user }: { user: Omit<User, "password"> }) => {
         description="Banking and payment account details."
         icon={<CreditCard className="size-5" />}
       >
-        <DetailItem label="Card number" value={user.bank?.cardNumber} sensitive />
+        <DetailItem label="Card number" value={user.bank?.cardNumber} />
         <DetailItem label="Card expiry" value={user.bank?.cardExpire} />
         <DetailItem label="Card type" value={user.bank?.cardType} />
         <DetailItem label="Currency" value={user.bank?.currency} />
-        <DetailItem label="IBAN" value={user.bank?.iban} sensitive />
+        <DetailItem label="IBAN" value={user.bank?.iban} />
       </DetailsSection>
 
       <DetailsSection
@@ -117,7 +117,7 @@ const UserDetails = ({ user }: { user: Omit<User, "password"> }) => {
         icon={<Wallet className="size-5" />}
       >
         <DetailItem label="Coin" value={user.crypto?.coin} />
-        <DetailItem label="Wallet address" value={user.crypto?.wallet} sensitive />
+        <DetailItem label="Wallet address" value={user.crypto?.wallet} />
         <DetailItem label="Network" value={user.crypto?.network} />
       </DetailsSection>
     </div>
@@ -158,7 +158,7 @@ const UserDetailsPage = () => {
     return <LoadingPage />;
   }
 
-  if (!isError || !user) {
+  if (isError || !user) {
     return (
       <ErrorAlert
         heading="Failed to load user details"
@@ -170,7 +170,7 @@ const UserDetailsPage = () => {
   }
 
   return (
-    <section className="mx-auto max-w-7xl space-y-6 pb-8">
+    <section className="mx-auto max-w-full space-y-6 pb-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-3">
           <Button

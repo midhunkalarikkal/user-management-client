@@ -61,6 +61,7 @@ export interface UserFormField {
   placeholder?: string;
   step?: string;
   autocomplete?: string;
+  visibility?: boolean;
 }
 
 // User form sections interface

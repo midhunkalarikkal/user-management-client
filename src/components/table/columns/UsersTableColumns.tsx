@@ -1,6 +1,6 @@
 import { createColumnHelper } from "@tanstack/react-table";
-import { Eye, Pencil, Trash2, MoreHorizontal, LoaderCircle } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Eye, Pencil, Trash2, MoreHorizontal, LoaderCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuItem,

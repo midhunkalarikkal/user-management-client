@@ -11,7 +11,7 @@ const useCreateUser = () => {
     mutationKey: ["create-user"],
     mutationFn: createUser,
 
-    onSuccess: async (createdUser) => {
+    onSuccess: async (createdUser, values) => {
       // Prevent ongoing requests from overwriting cached data.
       await queryClient.cancelQueries({
         queryKey: ["users"],
@@ -29,6 +29,7 @@ const useCreateUser = () => {
 
           const newUser: UsersTableColumn = {
             id: createdUser.id,
+            tag: createdUser.tag ?? values.tag,
             image: createdUser.image,
             firstName: createdUser.firstName,
             lastName: createdUser.lastName,
@@ -52,7 +53,10 @@ const useCreateUser = () => {
       );
 
       // Cache the newly created user's details.
-      queryClient.setQueryData<User>(["user", createdUser.id], createdUser);
+      queryClient.setQueryData<User>(["user", createdUser.id], {
+        ...createdUser,
+        tag: createdUser.tag ?? values.tag,
+      });
 
       toast.success("User created successfully.");
     },

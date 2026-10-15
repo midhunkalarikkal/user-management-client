@@ -1,7 +1,8 @@
-import type { UsersTableColumn, ApiPaginatedResponse } from "@/types/user";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { TEST_USER_TAG } from "@/utils/constant";
 import { deleteUser } from "@/services/user.service";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { UsersTableColumn, ApiPaginatedResponse } from "@/types/user";
 
 // Handles user deletion and updates the query cache.
 const useDeleteUser = () => {
@@ -9,18 +10,20 @@ const useDeleteUser = () => {
 
   const mutation = useMutation({
     mutationKey: ["delete-user"],
-    mutationFn: deleteUser,
+    mutationFn: (user: UsersTableColumn) =>
+      user.tag === TEST_USER_TAG ? Promise.resolve(null) : deleteUser(user.id),
 
-    onSuccess: async (data, userId) => {
-      if (!data.isDeleted) {
+    onSuccess: async (data, user) => {
+      if (data && !data.isDeleted) {
         toast.error("Could not confirm user deletion.");
         return;
       }
 
-      // Prevent in-flight list requests from overwriting the cache.
-      await queryClient.cancelQueries({
-        queryKey: ["users"],
-      });
+      // Prevent in-flight requests from overwriting the cache.
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: ["users"] }),
+        queryClient.cancelQueries({ queryKey: ["user", user.id] }),
+      ]);
 
       // Removes the deleted user from all cached users pages.
       queryClient.setQueriesData<ApiPaginatedResponse<UsersTableColumn>>(
@@ -28,7 +31,7 @@ const useDeleteUser = () => {
         (oldData) => {
           if (!oldData) return oldData;
 
-          const updatedUsers = oldData.users.filter((user) => user.id !== userId);
+          const updatedUsers = oldData.users.filter((cachedUser) => cachedUser.id !== user.id);
 
           return {
             ...oldData,
@@ -38,13 +41,15 @@ const useDeleteUser = () => {
         },
       );
 
+      queryClient.removeQueries({ queryKey: ["user", user.id], exact: true });
+
       toast.success("User deleted successfully.");
     },
   });
 
   return {
     ...mutation,
-    deletingUserId: mutation.isPending ? mutation.variables : null,
+    deletingUserId: mutation.isPending ? (mutation.variables?.id ?? null) : null,
   };
 };
 

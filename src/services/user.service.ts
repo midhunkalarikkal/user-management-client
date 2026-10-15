@@ -51,20 +51,17 @@ export async function getUserById(
 // Delete request for the selected user.
 export const deleteUser = async (userId: User["id"]): Promise<DeleteUserResponse> => {
   const { data } = await serverApi.delete<DeleteUserResponse>(`/users/${userId}`);
-
   return data;
 };
 
 // Creates a user with all entered details.
 export const createUser = async (values: UserFormValues): Promise<User> => {
   const { data } = await serverApi.post<User>("/users/", values);
-
   return data;
 };
 
 // Updates a users details.
 export const updateUser = async ({ userId, values }: UpdateUserParams): Promise<User> => {
   const { data } = await serverApi.put<User>(`/users/${userId}`, values);
-
   return data;
 };

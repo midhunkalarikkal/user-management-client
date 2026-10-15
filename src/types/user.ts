@@ -57,6 +57,7 @@ export type UserGender = "male" | "female" | "other";
 // User data from DummyJSON API
 export interface User {
   id: number;
+  tag?: string;
   firstName: string;
   lastName: string;
   maidenName: string;
@@ -117,7 +118,7 @@ export interface UsersSort {
 // Users table data
 export type UsersTableColumn = Pick<
   User,
-  "id" | "firstName" | "lastName" | "age" | "email" | "role" | "image"
+  "id" | "tag" | "firstName" | "lastName" | "age" | "email" | "role" | "image"
 >;
 
 // Get users query parameters

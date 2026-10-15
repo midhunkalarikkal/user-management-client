@@ -40,7 +40,7 @@ const UsersPage = () => {
             onCancel={closeToast}
             onConfirm={() => {
               closeToast();
-              deleteUser(user.id);
+              deleteUser(user);
             }}
           />
         ),

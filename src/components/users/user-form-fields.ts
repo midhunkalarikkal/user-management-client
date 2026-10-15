@@ -20,6 +20,7 @@ export const USER_FORM_SECTIONS = [
       { name: "hair.type", label: "Hair type" },
       { name: "image", label: "Profile image URL", type: "url" },
       { name: "university", label: "University" },
+      { name: "tag", label: "tag", visibility: false },
     ],
   },
   {

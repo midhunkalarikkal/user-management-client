@@ -24,9 +24,9 @@ const useDeleteUser = () => {
       }
 
       // Prevent in-flight list requests from overwriting the cache.
-      // await queryClient.cancelQueries({
-      //   queryKey: ["users"],
-      // });
+      await queryClient.cancelQueries({
+        queryKey: ["users"],
+      });
 
       // Removes the deleted user from all cached users pages.
       queryClient.setQueriesData<

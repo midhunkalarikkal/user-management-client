@@ -1,7 +1,7 @@
-import { UsersRound } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -13,9 +13,13 @@ import {
 } from "@/components/ui/sidebar";
 import { Link, useLocation } from "react-router";
 import { navigationItems } from "@/utils/constant";
+import useLogout from "@/hooks/mutations/auth/use-logout";
+import { LogOut, LoaderCircle, UsersRound } from "lucide-react";
 
 const AppSidebar = () => {
+
   const { pathname } = useLocation();
+  const { mutate: logout, isPending } = useLogout();
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
@@ -26,8 +30,12 @@ const AppSidebar = () => {
           </div>
 
           <div className="min-w-0 group-data-[collapsible=icon]:hidden">
-            <p className="truncate text-sm font-semibold">User Management</p>
-            <p className="text-xs text-muted-foreground">Dashboard</p>
+            <p className="truncate text-sm font-semibold">
+              User Management
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Dashboard
+            </p>
           </div>
         </div>
       </SidebarHeader>
@@ -42,7 +50,8 @@ const AppSidebar = () => {
                 const isActive =
                   item.url === "/users"
                     ? pathname === "/users" ||
-                      (pathname.startsWith("/users/") && pathname !== "/users/new")
+                    (pathname.startsWith("/users/") &&
+                      pathname !== "/users/new")
                     : pathname === item.url;
 
                 return (
@@ -63,9 +72,32 @@ const AppSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
+      <SidebarFooter className="border-t p-2">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => logout()}
+              disabled={isPending}
+              tooltip={isPending ? "Logging out..." : "Logout"}
+              className="cursor-pointer text-destructive hover:bg-destructive/10 hover:text-destructive"
+            >
+              {isPending ? (
+                <LoaderCircle className="size-4 animate-spin" />
+              ) : (
+                <LogOut className="size-4" />
+              )}
+
+              <span>
+                {isPending ? "Logging out..." : "Logout"}
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );
-}
+};
 
 export default AppSidebar;

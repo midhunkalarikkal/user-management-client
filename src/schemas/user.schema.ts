@@ -2,130 +2,232 @@ import { z } from "zod";
 import type { User } from "@/types/user";
 import { toDateInputValue } from "@/utils/helper/convertApiDate";
 
-// Validates an optional text field.
-const text = z.string().trim();
+const optionalText = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max, `Must not exceed ${max} characters`);
 
-// Validates a user location coordinate.
+const requiredText = (label: string, max: number) =>
+  z
+    .string()
+    .trim()
+    .min(1, `${label} is required`)
+    .max(max, `${label} must not exceed ${max} characters`);
+
+const optionalPattern = (
+  max: number,
+  pattern: RegExp,
+  message: string,
+) =>
+  optionalText(max).refine(
+    (value) => value === "" || pattern.test(value),
+    message,
+  );
+
 const latitude = z.number().finite().min(-90).max(90);
 const longitude = z.number().finite().min(-180).max(180);
 
-// Validates residential and company addresses.
+const optionalPhone = optionalText(25).refine(
+  (value) =>
+    value === "" ||
+    (/^\+?[\d\s().-]+$/.test(value) &&
+      value.replace(/\D/g, "").length >= 7 &&
+      value.replace(/\D/g, "").length <= 15),
+  "Enter a valid phone number",
+);
+
+const optionalIp = optionalText(45).refine(
+  (value) =>
+    value === "" ||
+    z.ipv4().safeParse(value).success ||
+    z.ipv6().safeParse(value).success,
+  "Enter a valid IPv4 or IPv6 address",
+);
+
+const optionalMac = optionalPattern(
+  17,
+  /^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$/,
+  "Enter a valid MAC address",
+);
+
+const optionalCardExpiry = optionalText(5).refine(
+  (value) => {
+    if (!value) return true;
+
+    const match = /^(0[1-9]|1[0-2])\/\d{2}$/.exec(value);
+
+    return Boolean(match);
+  },
+  "Enter a valid expiry date in MM/YY format",
+);
+
 const addressSchema = z.object({
-    address: text,
-    city: text,
-    state: text,
-    stateCode: text,
-    postalCode: text,
-    country: text,
-    coordinates: z.object({
-        lat: latitude,
-        lng: longitude,
-    }),
+  address: optionalText(200),
+  city: optionalText(100),
+  state: optionalText(100),
+  stateCode: optionalText(20),
+
+  postalCode: optionalPattern(
+    20,
+    /^[\p{L}\p{N}\s-]+$/u,
+    "Enter a valid postal code",
+  ),
+
+  country: optionalText(100),
+
+  coordinates: z.object({
+    lat: latitude,
+    lng: longitude,
+  }),
 });
 
-// Validates hair information.
 const hairSchema = z.object({
-    color: text,
-    type: text,
+  color: optionalText(50),
+  type: optionalText(50),
 });
 
-// Validates bank information.
 const bankSchema = z.object({
-    cardExpire: text,
-    cardNumber: text,
-    cardType: text,
-    currency: text,
-    iban: text,
+  cardExpire: optionalCardExpiry,
+
+  cardNumber: optionalPattern(
+    19,
+    /^\d{12,19}$/,
+    "Card number must contain 12 to 19 digits",
+  ),
+
+  cardType: optionalText(50),
+
+  currency: optionalPattern(
+    3,
+    /^[A-Z]{3}$/,
+    "Enter a valid 3-letter currency code",
+  ),
+
+  iban: optionalPattern(
+    34,
+    /^[A-Za-z0-9]+$/,
+    "IBAN must contain only letters and numbers",
+  ),
 });
 
-// Validates company information.
 const companySchema = z.object({
-    department: text,
-    name: text,
-    title: text,
-    address: addressSchema,
+  department: optionalText(100),
+  name: optionalText(150),
+  title: optionalText(100),
+  address: addressSchema,
 });
 
-// Validates cryptocurrency information.
 const cryptoSchema = z.object({
-    coin: text,
-    wallet: text,
-    network: text,
+  coin: optionalText(50),
+  wallet: optionalText(150),
+  network: optionalText(100),
 });
 
-// Shared zod validation schema  for creating and editing users.
 export const userFormSchema = z.object({
-    firstName: z.string().trim().min(1, "First name is required"),
-    lastName: z.string().trim().min(1, "Last name is required"),
-    maidenName: text,
+  firstName: requiredText("First name", 50),
+  lastName: requiredText("Last name", 50),
+  maidenName: optionalText(50),
 
-    age: z
-        .number()
-        .int("Age must be a whole number")
-        .min(1, "Age must be at least 1")
-        .max(120, "Age must be 120 or less"),
+  age: z
+    .number()
+    .int("Age must be a whole number")
+    .min(1, "Age must be at least 1")
+    .max(120, "Age must be 120 or less"),
 
-    image: z
-        .string()
-        .trim()
-        .min(1, "Profile image is required")
-        .pipe(z.url("Enter a valid image URL")),
+  gender: z.enum(["male", "female", "other"]),
 
-    role: z.enum(["admin", "moderator", "user"]),
+  email: z
+    .string()
+    .trim()
+    .min(1, "Email is required")
+    .max(254, "Email must not exceed 254 characters")
+    .pipe(z.email("Enter a valid email address")),
 
-    gender: z.enum(["male", "female", "other"]),
+  phone: optionalPhone,
 
-    email: z.email("Enter a valid email address"),
-    phone: text,
-
-    username: z
-        .string()
-        .trim()
-        .min(3, "Username must contain at least 3 characters"),
-
-    password: z.string(),
-
-    birthDate: z.string().refine(
-        (value) =>
-            !value ||
-            (/^\d{4}-\d{2}-\d{2}$/.test(value) &&
-                !Number.isNaN(Date.parse(value))),
-        "Enter a valid date",
+  username: z
+    .string()
+    .trim()
+    .min(3, "Username must contain at least 3 characters")
+    .max(30, "Username must not exceed 30 characters")
+    .regex(
+      /^[a-zA-Z0-9._-]+$/,
+      "Username can only contain letters, numbers, dots, underscores and hyphens",
     ),
 
-    bloodGroup: text,
+  password: z
+    .string()
+    .max(128, "Password must not exceed 128 characters"),
 
-    height: z.number().finite().min(0, "Height cannot be negative"),
-    weight: z.number().finite().min(0, "Weight cannot be negative"),
+  birthDate: z
+    .string()
+    .refine(
+      (value) =>
+        value === "" || z.iso.date().safeParse(value).success,
+      "Enter a valid date",
+    )
+    .refine(
+      (value) =>
+        value === "" || value <= new Date().toISOString().slice(0, 10),
+      "Date of birth cannot be in the future",
+    ),
 
-    eyeColor: text,
-    hair: hairSchema,
+  image: z
+    .string()
+    .trim()
+    .min(1, "Profile image is required")
+    .max(2048, "Image URL must not exceed 2048 characters")
+    .pipe(z.httpUrl("Enter a valid HTTP or HTTPS image URL")),
 
-    ip: text,
-    address: addressSchema,
-    macAddress: text,
-    university: text,
+  bloodGroup: optionalPattern(
+    3,
+    /^(A|B|AB|O)[+-]$/,
+    "Enter a valid blood group",
+  ),
 
-    bank: bankSchema,
-    company: companySchema,
+  height: z
+    .number()
+    .finite()
+    .min(0, "Height cannot be negative")
+    .max(300, "Height cannot exceed 300 cm"),
 
-    ein: text,
-    ssn: text,
-    userAgent: text,
-    crypto: cryptoSchema,
+  weight: z
+    .number()
+    .finite()
+    .min(0, "Weight cannot be negative")
+    .max(500, "Weight cannot exceed 500 kg"),
+
+  eyeColor: optionalText(50),
+  hair: hairSchema,
+
+  ip: optionalIp,
+  address: addressSchema,
+  macAddress: optionalMac,
+
+  university: optionalText(200),
+
+  bank: bankSchema,
+  company: companySchema,
+
+  ein: optionalText(30),
+  ssn: optionalText(30),
+  userAgent: optionalText(1024),
+
+  crypto: cryptoSchema,
+
+  role: z.enum(["admin", "moderator", "user"]),
 });
 
-// Create new user zod schema, adding a password required filed.
 export const createUserSchema = userFormSchema.extend({
-    password: z
-        .string()
-        .min(6, "Password must contain at least 6 characters"),
+  password: z
+    .string()
+    .min(6, "Password must contain at least 6 characters")
+    .max(128, "Password must not exceed 128 characters"),
 });
 
-// Editing a user zod validation schema, editing allows the password to remain unchanged.
 export const editUserSchema = userFormSchema;
 
-// Defines the complete form values.
 export type UserFormValues = z.infer<typeof userFormSchema>;
 
 const emptyAddress = () => ({

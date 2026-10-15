@@ -63,7 +63,11 @@ const UserForm = ({
 
     // Loads the existing record when editing a user.
     useEffect(() => {
-        reset(user ? getUserFormValues(user) : getDefaultUserValues());
+        if (user) {
+            reset(getUserFormValues(user));
+        } else {
+            reset(getDefaultUserValues());
+        }
     }, [user, reset]);
 
     // Renders one field with its own validation error.
